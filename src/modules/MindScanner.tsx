@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Battery, Coffee, Zap, Moon } from 'lucide-react';
+import { Battery, Coffee, Zap, Moon, Sparkles, Loader2 } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly, OlyState } from '@/components/Oly';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { useAI } from '@/hooks/useAI';
 
 interface MindScannerProps {
   onBack: () => void;
@@ -18,9 +20,16 @@ interface Recommendation {
 
 export function MindScanner({ onBack }: MindScannerProps) {
   const [energyLevel, setEnergyLevel] = useState([50]);
+  const [aiSuggestion, setAiSuggestion] = useState<{
+    suggestion: string;
+    reason: string;
+    emoji: string;
+  } | null>(null);
+  const { isLoading, suggestActivity } = useAI();
 
   const getOlyState = (): OlyState => {
-    return energyLevel[0] < 40 ? 'low_energy' : 'high_energy';
+    if (isLoading) return 'working';
+    return energyLevel[0] < 40 ? 'neutral' : 'success';
   };
 
   const getRecommendations = (): Recommendation[] => {
@@ -64,6 +73,14 @@ export function MindScanner({ onBack }: MindScannerProps) {
     return 'Fully Charged!';
   };
 
+  const getAISuggestion = async () => {
+    setAiSuggestion(null);
+    const result = await suggestActivity(energyLevel[0]);
+    if (result) {
+      setAiSuggestion(result);
+    }
+  };
+
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
@@ -97,7 +114,10 @@ export function MindScanner({ onBack }: MindScannerProps) {
           </div>
           <Slider
             value={energyLevel}
-            onValueChange={setEnergyLevel}
+            onValueChange={(value) => {
+              setEnergyLevel(value);
+              setAiSuggestion(null);
+            }}
             max={100}
             step={5}
             className="w-full"
@@ -117,9 +137,45 @@ export function MindScanner({ onBack }: MindScannerProps) {
         </div>
       </GlassCard>
 
+      {/* AI Suggestion Button */}
+      <Button
+        onClick={getAISuggestion}
+        disabled={isLoading}
+        className="w-full mb-4 neon-glow"
+        size="lg"
+      >
+        {isLoading ? (
+          <Loader2 className="mr-2 animate-spin" size={20} />
+        ) : (
+          <Sparkles className="mr-2" size={20} />
+        )}
+        Get AI Suggestion
+      </Button>
+
+      {/* AI Suggestion Result */}
+      {aiSuggestion && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <GlassCard hover={false} className="neon-glow">
+            <div className="text-center">
+              <span className="text-4xl mb-3 block">{aiSuggestion.emoji}</span>
+              <h4 className="font-bold text-primary text-lg mb-2">
+                {aiSuggestion.suggestion}
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                {aiSuggestion.reason}
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
+
       {/* Recommendations */}
       <h3 className="text-lg font-semibold mb-3 text-foreground">
-        Oly's Recommendations
+        Quick Recommendations
       </h3>
       <div className="space-y-3">
         {getRecommendations().map((rec, index) => (
