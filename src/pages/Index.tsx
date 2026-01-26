@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { GlassCard } from '@/components/GlassCard';
 import { Oly } from '@/components/Oly';
@@ -11,8 +11,9 @@ import { DecisionMaker } from '@/modules/DecisionMaker';
 import { MindScanner } from '@/modules/MindScanner';
 import { SuccessArchive } from '@/modules/SuccessArchive';
 import { Settings } from '@/modules/Settings';
+import { OlyChat } from '@/modules/OlyChat';
 
-type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings';
+type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat';
 
 interface ModuleCard {
   id: ActiveModule;
@@ -63,6 +64,13 @@ const modules: ModuleCard[] = [
     title: 'Success Archive',
     description: 'Your wins and focus milestones',
     icon: <Trophy size={28} />,
+    color: 'text-primary',
+  },
+  {
+    id: 'chat',
+    title: 'Chat with Oly',
+    description: 'Talk to your ADHD buddy',
+    icon: <MessageCircle size={28} />,
     color: 'text-primary',
   },
 ];
@@ -126,6 +134,8 @@ const Index = () => {
             onUpdateOlySize={setOlySize}
           />
         );
+      case 'chat':
+        return <OlyChat onBack={goToHub} />;
       default:
         return null;
     }

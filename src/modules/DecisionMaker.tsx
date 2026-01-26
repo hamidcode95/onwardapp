@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Star, Shuffle } from 'lucide-react';
+import { Plus, Trash2, Star, Shuffle, Loader2, Sparkles } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly, OlyState } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAI } from '@/hooks/useAI';
 
 interface Option {
   id: string;
@@ -22,10 +23,12 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
   const [newOption, setNewOption] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [result, setResult] = useState<Option | null>(null);
+  const [aiReason, setAiReason] = useState<string | null>(null);
+  const { isLoading, decideForMe } = useAI();
 
   const getOlyState = (): OlyState => {
-    if (isThinking) return 'thinking';
-    if (result) return 'reveal';
+    if (isThinking || isLoading) return 'working';
+    if (result) return 'success';
     return 'neutral';
   };
 
@@ -52,6 +55,7 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
     if (options.length === 0) return;
 
     setResult(null);
+    setAiReason(null);
     setIsThinking(true);
 
     // Weighted random selection
@@ -70,8 +74,29 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
     }, 2000);
   };
 
+  const makeAIDecision = async () => {
+    if (options.length < 2) return;
+
+    setResult(null);
+    setAiReason(null);
+    
+    const aiResult = await decideForMe(options.map(o => ({ text: o.text, priority: o.priority })));
+    
+    if (aiResult) {
+      // Find the matching option
+      const chosen = options.find(o => 
+        o.text.toLowerCase().includes(aiResult.choice.toLowerCase()) ||
+        aiResult.choice.toLowerCase().includes(o.text.toLowerCase())
+      ) || options[0];
+      
+      setResult(chosen);
+      setAiReason(aiResult.reason);
+    }
+  };
+
   const resetDecision = () => {
     setResult(null);
+    setAiReason(null);
   };
 
   return (
@@ -103,6 +128,11 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
             <GlassCard className="neon-glow text-center" hover={false}>
               <h3 className="text-sm text-muted-foreground mb-2">Oly says:</h3>
               <p className="text-2xl font-bold text-primary neon-text">{result.text}</p>
+              {aiReason && (
+                <p className="text-sm text-muted-foreground mt-2 italic">
+                  "{aiReason}"
+                </p>
+              )}
               <Button
                 variant="outline"
                 onClick={resetDecision}
@@ -182,17 +212,38 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
             </AnimatePresence>
           </div>
 
-          {/* Decision Button */}
+          {/* Decision Buttons */}
           {options.length >= 2 && (
-            <Button
-              onClick={makeDecision}
-              className="w-full neon-glow"
-              size="lg"
-              disabled={isThinking}
-            >
-              <Shuffle size={20} className="mr-2" />
-              {isThinking ? 'Oly is thinking...' : 'Let Oly Decide!'}
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={makeDecision}
+                className="w-full neon-glow"
+                size="lg"
+                disabled={isThinking || isLoading}
+              >
+                {isThinking ? (
+                  <Loader2 size={20} className="mr-2 animate-spin" />
+                ) : (
+                  <Shuffle size={20} className="mr-2" />
+                )}
+                {isThinking ? 'Oly is thinking...' : 'Random Pick'}
+              </Button>
+              
+              <Button
+                onClick={makeAIDecision}
+                variant="outline"
+                className="w-full"
+                size="lg"
+                disabled={isThinking || isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 size={20} className="mr-2 animate-spin" />
+                ) : (
+                  <Sparkles size={20} className="mr-2" />
+                )}
+                Let AI Decide
+              </Button>
+            </div>
           )}
 
           {options.length < 2 && (

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly, OlyState } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAI } from '@/hooks/useAI';
 
 interface Task {
   id: string;
@@ -24,8 +25,10 @@ export function TaskShredder({ onBack }: TaskShredderProps) {
   const [newTask, setNewTask] = useState('');
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
   const [newSubTask, setNewSubTask] = useState('');
+  const { isLoading, shredTask } = useAI();
 
   const getOlyState = (): OlyState => {
+    if (isLoading) return 'working';
     if (tasks.length === 0) return 'neutral';
     const allCompleted = tasks.every(t => 
       t.subTasks.length > 0 
@@ -42,6 +45,40 @@ export function TaskShredder({ onBack }: TaskShredderProps) {
       ...tasks,
       { id: crypto.randomUUID(), text: newTask, completed: false, subTasks: [] },
     ]);
+    setNewTask('');
+  };
+
+  const addTaskWithAI = async () => {
+    if (!newTask.trim()) return;
+    
+    const taskId = crypto.randomUUID();
+    const newTaskObj: Task = { 
+      id: taskId, 
+      text: newTask, 
+      completed: false, 
+      subTasks: [] 
+    };
+    
+    setTasks(prev => [...prev, newTaskObj]);
+    setExpandedTask(taskId);
+    
+    const subTasks = await shredTask(newTask);
+    
+    if (subTasks && subTasks.length > 0) {
+      setTasks(prev => prev.map(t => 
+        t.id === taskId 
+          ? { 
+              ...t, 
+              subTasks: subTasks.map(text => ({
+                id: crypto.randomUUID(),
+                text,
+                completed: false,
+              }))
+            }
+          : t
+      ));
+    }
+    
     setNewTask('');
   };
 
@@ -100,11 +137,34 @@ export function TaskShredder({ onBack }: TaskShredderProps) {
             placeholder="Enter a big task to shred..."
             className="bg-background/50 border-border"
             onKeyDown={(e) => e.key === 'Enter' && addTask()}
+            disabled={isLoading}
           />
-          <Button onClick={addTask} size="icon" className="shrink-0">
+          <Button 
+            onClick={addTask} 
+            size="icon" 
+            variant="outline"
+            className="shrink-0"
+            disabled={isLoading || !newTask.trim()}
+          >
             <Plus size={20} />
           </Button>
+          <Button 
+            onClick={addTaskWithAI} 
+            size="icon" 
+            className="shrink-0 neon-glow"
+            disabled={isLoading || !newTask.trim()}
+            title="AI Auto-Shred"
+          >
+            {isLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <Sparkles size={20} />
+            )}
+          </Button>
         </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          ✨ Click the sparkle button to let AI break down your task automatically!
+        </p>
       </GlassCard>
 
       {/* Tasks List */}
@@ -203,7 +263,7 @@ export function TaskShredder({ onBack }: TaskShredderProps) {
 
       {tasks.length === 0 && (
         <div className="text-center text-muted-foreground mt-8">
-          <p>No tasks yet. Add a big task to start shredding!</p>
+          <p>No tasks yet. Add a big task and let AI shred it! ✨</p>
         </div>
       )}
     </div>
