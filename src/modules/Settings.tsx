@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Volume2, Palette, Maximize } from 'lucide-react';
+import { User, Volume2, Palette, Maximize, LogOut } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SettingsProps {
   onBack: () => void;
@@ -34,6 +35,7 @@ export function Settings({
   const [localName, setLocalName] = useState(userName);
   const [localOlySize, setLocalOlySize] = useState([olySize]);
   const [selectedSound, setSelectedSound] = useState('none');
+  const { signOut } = useAuth();
 
   const handleNameSave = () => {
     onUpdateName(localName);
@@ -150,6 +152,18 @@ export function Settings({
           🎨 More themes coming soon
         </p>
       </GlassCard>
+
+      {/* Sign Out */}
+      <div className="mt-6">
+        <Button
+          onClick={signOut}
+          variant="outline"
+          className="w-full gap-2 border-destructive/30 text-destructive hover:bg-destructive/10"
+        >
+          <LogOut size={18} />
+          Sign Out
+        </Button>
+      </div>
     </div>
   );
 }

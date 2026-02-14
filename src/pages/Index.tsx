@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, LogOut } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
+import { useAuth } from '@/hooks/useAuth';
 import { GlassCard } from '@/components/GlassCard';
 import { Oly } from '@/components/Oly';
 import { TaskShredder } from '@/modules/TaskShredder';
@@ -77,6 +78,7 @@ const modules: ModuleCard[] = [
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState<ActiveModule>('hub');
+  const { user, signOut } = useAuth();
   const {
     state,
     updateUserName,
@@ -87,6 +89,20 @@ const Index = () => {
     setOlySize,
     setAmbientSound,
   } = useAppState();
+
+  // Auto-set username from OAuth profile
+  useEffect(() => {
+    if (user) {
+      const name =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split('@')[0] ||
+        'Friend';
+      if (state.userName === 'Friend' || state.userName === '') {
+        updateUserName(name);
+      }
+    }
+  }, [user]);
 
   const goToHub = () => setActiveModule('hub');
 
