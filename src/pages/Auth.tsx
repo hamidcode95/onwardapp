@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Brain, Sparkles, Heart } from 'lucide-react';
+import { Sparkles, Heart } from 'lucide-react';
+import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
 import { lovable } from '@/integrations/lovable/index';
 import { useState } from 'react';
@@ -44,8 +45,8 @@ const Auth = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl glass-card neon-glow flex items-center justify-center">
-            <Brain className="text-primary" size={40} />
+          <div className="w-24 h-24 mx-auto mb-4">
+            <img src={onwardLogo} alt="Onward Logo" className="w-full h-full object-contain drop-shadow-[0_0_20px_hsla(150,47%,71%,0.4)]" />
           </div>
           <h1 className="text-3xl font-bold text-foreground neon-text tracking-tight">
             Onward
