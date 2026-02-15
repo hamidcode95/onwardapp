@@ -1,5 +1,5 @@
-import { motion, useAnimationControls } from 'framer-motion';
-import { useEffect, useMemo, useRef } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { useState, useMemo, useCallback } from 'react';
 
 export type OlyState = 
   | 'neutral' 
@@ -147,6 +147,7 @@ interface OlyProps {
   className?: string;
   showRing?: boolean;
   ringProgress?: number;
+  onClick?: () => void;
 }
 
 export function Oly({ 
@@ -155,11 +156,25 @@ export function Oly({
   className = '',
   showRing = false,
   ringProgress = 0,
+  onClick,
 }: OlyProps) {
   const config = STATE_CONFIGS[state];
   const radius = size / 2 - 10;
   const svgSize = size + 20;
   const center = svgSize / 2;
+  const blobControls = useAnimation();
+  const [isBouncing, setIsBouncing] = useState(false);
+
+  const handleClick = useCallback(() => {
+    if (isBouncing) return;
+    setIsBouncing(true);
+    blobControls.start({
+      scale: [1, 1.25, 0.85, 1.1, 0.95, 1],
+      rotate: [0, -8, 10, -5, 3, 0],
+      transition: { duration: 0.6, ease: 'easeOut' },
+    }).then(() => setIsBouncing(false));
+    onClick?.();
+  }, [isBouncing, blobControls, onClick]);
 
   // Generate multiple blob path keyframes for morphing
   const blobPaths = useMemo(() => {
@@ -272,10 +287,13 @@ export function Oly({
 
   return (
     <motion.div
-      className={`relative inline-flex items-center justify-center ${className}`}
+      className={`relative inline-flex items-center justify-center cursor-pointer select-none ${className}`}
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.4 }}
+      onClick={handleClick}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.92 }}
     >
       {showRing && (
         <svg
@@ -309,7 +327,7 @@ export function Oly({
       )}
 
       <motion.div
-        animate={{ scale: config.pulseScale }}
+        animate={isBouncing ? undefined : { scale: config.pulseScale }}
         transition={{
           duration: config.speed * 0.8,
           repeat: Infinity,
@@ -317,6 +335,7 @@ export function Oly({
           ease: 'easeInOut',
         }}
       >
+      <motion.div animate={blobControls}>
         <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
           <defs>
             <radialGradient id={`blob-grad-${state}`} cx="35%" cy="35%" r="65%">
@@ -364,6 +383,7 @@ export function Oly({
 
           {renderEyes()}
         </svg>
+      </motion.div>
       </motion.div>
     </motion.div>
   );
