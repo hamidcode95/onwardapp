@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, LogOut } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
 import { GlassCard } from '@/components/GlassCard';
 import { Oly } from '@/components/Oly';
 import { TaskShredder } from '@/modules/TaskShredder';
@@ -80,6 +81,14 @@ const Index = () => {
   const [activeModule, setActiveModule] = useState<ActiveModule>('hub');
   const { user, signOut } = useAuth();
   const {
+    requestPermission,
+    notifyFocusComplete,
+    notifyTaskComplete,
+    startMotivationLoop,
+    startFocusReminders,
+    sendToast,
+  } = useNotifications();
+  const {
     state,
     updateUserName,
     addFocusMinutes,
@@ -89,6 +98,16 @@ const Index = () => {
     setOlySize,
     setAmbientSound,
   } = useAppState();
+
+  // Request notification permission and start reminders
+  useEffect(() => {
+    requestPermission().then((granted) => {
+      if (granted) {
+        startMotivationLoop();
+        startFocusReminders();
+      }
+    });
+  }, []);
 
   // Auto-set username from OAuth profile
   useEffect(() => {
@@ -115,7 +134,10 @@ const Index = () => {
         return (
           <FocusRoom
             onBack={goToHub}
-            onComplete={addFocusMinutes}
+            onComplete={(minutes) => {
+              addFocusMinutes(minutes);
+              notifyFocusComplete(minutes);
+            }}
           />
         );
       case 'dump':
@@ -181,7 +203,20 @@ const Index = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Oly state="neutral" size={state.olySize} />
+          <Oly
+            state="neutral"
+            size={state.olySize}
+            onClick={() => {
+              const msgs = [
+                'سلام! امروز چه کاری انجام میدیم؟ 🎯',
+                'آماده‌ای برای یه روز عالی؟ 💪',
+                'هی! بزن بریم یه تسک بزنیم! ✨',
+                'من اینجام، هر وقت آماده بودی! 🌟',
+                'یه نفس عمیق بکش... حالا بزن بریم! 🧘',
+              ];
+              sendToast('🫧 Oly', msgs[Math.floor(Math.random() * msgs.length)]);
+            }}
+          />
         </motion.div>
 
         {/* Module Grid */}
