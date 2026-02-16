@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Volume2, Palette, Maximize, LogOut } from 'lucide-react';
+import { User, Volume2, Palette, Maximize, LogOut, Bell } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications, loadNotificationSettings, type NotificationSettings } from '@/hooks/useNotifications';
 
 interface SettingsProps {
   onBack: () => void;
@@ -35,7 +37,9 @@ export function Settings({
   const [localName, setLocalName] = useState(userName);
   const [localOlySize, setLocalOlySize] = useState([olySize]);
   const [selectedSound, setSelectedSound] = useState('none');
+  const [notifSettings, setNotifSettings] = useState<NotificationSettings>(loadNotificationSettings);
   const { signOut } = useAuth();
+  const { applySettings, sendToast } = useNotifications();
 
   const handleNameSave = () => {
     onUpdateName(localName);
@@ -102,6 +106,84 @@ export function Settings({
             className="w-full"
           />
         </div>
+      </GlassCard>
+
+      {/* Notification Settings */}
+      <GlassCard className="mb-4" hover={false}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-primary/20">
+            <Bell size={20} className="text-primary" />
+          </div>
+          <h3 className="font-semibold">Notifications</h3>
+        </div>
+
+        {/* Motivation toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-sm font-medium text-foreground">پیام‌های انگیزشی</p>
+            <p className="text-xs text-muted-foreground">پیام‌های Oly برای انگیزه دادن</p>
+          </div>
+          <Switch
+            checked={notifSettings.motivationEnabled}
+            onCheckedChange={(checked) => {
+              const updated = { ...notifSettings, motivationEnabled: checked };
+              setNotifSettings(updated);
+              applySettings(updated);
+            }}
+          />
+        </div>
+        {notifSettings.motivationEnabled && (
+          <div className="mb-4 px-1">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+              <span>هر {notifSettings.motivationIntervalMin} دقیقه</span>
+            </div>
+            <Slider
+              value={[notifSettings.motivationIntervalMin]}
+              onValueChange={([v]) => {
+                const updated = { ...notifSettings, motivationIntervalMin: v };
+                setNotifSettings(updated);
+                applySettings(updated);
+              }}
+              min={5}
+              max={60}
+              step={5}
+            />
+          </div>
+        )}
+
+        {/* Focus reminders toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-sm font-medium text-foreground">یادآوری فوکوس</p>
+            <p className="text-xs text-muted-foreground">یادآوری برای شروع جلسه تمرکز</p>
+          </div>
+          <Switch
+            checked={notifSettings.focusRemindersEnabled}
+            onCheckedChange={(checked) => {
+              const updated = { ...notifSettings, focusRemindersEnabled: checked };
+              setNotifSettings(updated);
+              applySettings(updated);
+            }}
+          />
+        </div>
+        {notifSettings.focusRemindersEnabled && (
+          <div className="px-1">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+              <span>هر {notifSettings.focusReminderIntervalMin} دقیقه</span>
+            </div>
+            <Slider
+              value={[notifSettings.focusReminderIntervalMin]}
+              onValueChange={([v]) => {
+                const updated = { ...notifSettings, focusReminderIntervalMin: v };
+                setNotifSettings(updated);
+                applySettings(updated);
+              }}
+              min={15}
+              max={120}
+              step={15}
+            />
+          </div>
+        )}
       </GlassCard>
 
       {/* Ambient Sounds */}
