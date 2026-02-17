@@ -23,3 +23,7 @@ Follow these steps to run the project locally:
 ```bash
 git clone [https://github.com/hamidcode95/onwardapp.git](https://github.com/hamidcode95/onwardapp.git)
 cd onwardapp
+
+### 2. 🌐 Deployment
+The app is configured for deployment on Vercel.
+Current Live Demo: https://onwardapp.ir
