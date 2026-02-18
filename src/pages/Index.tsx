@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -20,7 +20,7 @@ import { SuccessArchive } from '@/modules/SuccessArchive';
 import { Settings } from '@/modules/Settings';
 import { OlyChat } from '@/modules/OlyChat';
 
-type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat';
+type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary';
 
 interface ModuleCard {
   id: ActiveModule;
@@ -37,6 +37,7 @@ const modules: ModuleCard[] = [
   { id: 'scanner', title: 'Mind Scanner', description: 'Check your mental fuel level', icon: <Activity size={28} /> },
   { id: 'archive', title: 'Success Archive', description: 'Your wins and focus milestones', icon: <Trophy size={28} /> },
   { id: 'chat', title: 'Chat with Oly', description: 'Talk to your ADHD buddy', icon: <MessageCircle size={28} /> },
+  { id: 'sanctuary' as ActiveModule, title: "Oly's Sanctuary", description: 'Spend feathers, decorate home', icon: <HomeIcon size={28} /> },
 ];
 
 const Index = () => {
@@ -113,7 +114,7 @@ const Index = () => {
             onComplete={(minutes) => {
               addFocusMinutes(minutes);
               notifyFocusComplete(minutes);
-              handleFeatherEarn(10);
+              handleFeatherEarn(50);
             }}
           />
         );
@@ -212,8 +213,17 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 * index }}
             >
-              <GlassCard onClick={() => setActiveModule(module.id)} className="h-full">
-                <div className="text-primary mb-2">{module.icon}</div>
+              <GlassCard
+                onClick={() => {
+                  if (module.id === 'sanctuary') {
+                    setShowSanctuary(true);
+                  } else {
+                    setActiveModule(module.id);
+                  }
+                }}
+                className={`h-full ${module.id === 'sanctuary' ? 'border border-[hsl(140,50%,55%)] shadow-[0_0_12px_hsla(140,50%,55%,0.3)]' : ''}`}
+              >
+                <div className={`mb-2 ${module.id === 'sanctuary' ? 'text-[hsl(45,80%,55%)]' : 'text-primary'}`}>{module.icon}</div>
                 <h3 className="font-semibold text-foreground text-sm">{module.title}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{module.description}</p>
               </GlassCard>
@@ -221,19 +231,13 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Bottom Buttons */}
+        {/* Settings Button */}
         <motion.div
-          className="fixed bottom-4 right-4 flex gap-2 z-20"
+          className="fixed bottom-4 right-4 z-20"
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, delay: 0.8 }}
         >
-          <button
-            onClick={() => setShowSanctuary(true)}
-            className="glass-card p-3 rounded-full neon-glow hover:scale-110 transition-transform"
-          >
-            <Home size={24} className="text-primary" />
-          </button>
           <button
             onClick={() => setActiveModule('settings')}
             className="glass-card p-3 rounded-full neon-glow hover:scale-110 transition-transform"
