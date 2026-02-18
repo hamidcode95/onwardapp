@@ -27,6 +27,9 @@ export interface AppState {
   tasks: Task[];
   olySize: number;
   ambientSound: string | null;
+  feathers: number;
+  purchasedItems: string[];
+  lastVisitDate: string | null;
 }
 
 const defaultState: AppState = {
@@ -38,6 +41,9 @@ const defaultState: AppState = {
   tasks: [],
   olySize: 100,
   ambientSound: null,
+  feathers: 0,
+  purchasedItems: [],
+  lastVisitDate: null,
 };
 
 const STORAGE_KEY = 'onward_adhd_state';
@@ -152,6 +158,48 @@ export function useAppState() {
     setState(prev => ({ ...prev, ambientSound: sound }));
   }, []);
 
+  const addFeathers = useCallback((amount: number) => {
+    setState(prev => ({ ...prev, feathers: prev.feathers + amount }));
+  }, []);
+
+  const spendFeathers = useCallback((amount: number): boolean => {
+    let success = false;
+    setState(prev => {
+      if (prev.feathers >= amount) {
+        success = true;
+        return { ...prev, feathers: prev.feathers - amount };
+      }
+      return prev;
+    });
+    return success;
+  }, []);
+
+  const purchaseItem = useCallback((itemId: string, cost: number): boolean => {
+    let success = false;
+    setState(prev => {
+      if (prev.feathers >= cost && !prev.purchasedItems.includes(itemId)) {
+        success = true;
+        return {
+          ...prev,
+          feathers: prev.feathers - cost,
+          purchasedItems: [...prev.purchasedItems, itemId],
+        };
+      }
+      return prev;
+    });
+    return success;
+  }, []);
+
+  const markVisitToday = useCallback(() => {
+    const today = new Date().toDateString();
+    setState(prev => ({ ...prev, lastVisitDate: today }));
+  }, []);
+
+  const isFirstVisitToday = useCallback(() => {
+    const today = new Date().toDateString();
+    return state.lastVisitDate !== today;
+  }, [state.lastVisitDate]);
+
   return {
     state,
     updateUserName,
@@ -165,5 +213,10 @@ export function useAppState() {
     removeTask,
     setOlySize,
     setAmbientSound,
+    addFeathers,
+    spendFeathers,
+    purchaseItem,
+    markVisitToday,
+    isFirstVisitToday,
   };
 }

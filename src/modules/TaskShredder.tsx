@@ -18,9 +18,10 @@ interface Task {
 
 interface TaskShredderProps {
   onBack: () => void;
+  onFeatherEarn?: () => void;
 }
 
-export function TaskShredder({ onBack }: TaskShredderProps) {
+export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState('');
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
@@ -97,9 +98,13 @@ export function TaskShredder({ onBack }: TaskShredderProps) {
       t.id === taskId 
         ? { 
             ...t, 
-            subTasks: t.subTasks.map(st => 
-              st.id === subTaskId ? { ...st, completed: !st.completed } : st
-            ),
+            subTasks: t.subTasks.map(st => {
+              if (st.id === subTaskId) {
+                if (!st.completed) onFeatherEarn?.();
+                return { ...st, completed: !st.completed };
+              }
+              return st;
+            }),
           }
         : t
     ));
