@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, LogOut } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { GlassCard } from '@/components/GlassCard';
 import { Oly } from '@/components/Oly';
+import { FeatherCounter } from '@/components/FeatherCounter';
+import { LivingBackground } from '@/components/LivingBackground';
+import { DailySpark } from '@/components/DailySpark';
+import { SanctuaryItems } from '@/components/SanctuaryItems';
+import { SanctuaryShop } from '@/components/SanctuaryShop';
 import { TaskShredder } from '@/modules/TaskShredder';
 import { FocusRoom } from '@/modules/FocusRoom';
 import { BrainDump } from '@/modules/BrainDump';
@@ -22,70 +27,28 @@ interface ModuleCard {
   title: string;
   description: string;
   icon: React.ReactNode;
-  color: string;
 }
 
 const modules: ModuleCard[] = [
-  {
-    id: 'shredder',
-    title: 'Task Shredder',
-    description: 'Break big goals into tiny bites',
-    icon: <Scissors size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'focus',
-    title: 'Focus Room',
-    description: 'Work alongside Oly with visual timers',
-    icon: <Clock size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'dump',
-    title: 'Brain Dump',
-    description: 'Empty your mind instantly',
-    icon: <Brain size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'decision',
-    title: 'Decision Maker',
-    description: 'Let Oly choose your next move',
-    icon: <Shuffle size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'scanner',
-    title: 'Mind Scanner',
-    description: 'Check your mental fuel level',
-    icon: <Activity size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'archive',
-    title: 'Success Archive',
-    description: 'Your wins and focus milestones',
-    icon: <Trophy size={28} />,
-    color: 'text-primary',
-  },
-  {
-    id: 'chat',
-    title: 'Chat with Oly',
-    description: 'Talk to your ADHD buddy',
-    icon: <MessageCircle size={28} />,
-    color: 'text-primary',
-  },
+  { id: 'shredder', title: 'Task Shredder', description: 'Break big goals into tiny bites', icon: <Scissors size={28} /> },
+  { id: 'focus', title: 'Focus Room', description: 'Work alongside Oly with visual timers', icon: <Clock size={28} /> },
+  { id: 'dump', title: 'Brain Dump', description: 'Empty your mind instantly', icon: <Brain size={28} /> },
+  { id: 'decision', title: 'Decision Maker', description: 'Let Oly choose your next move', icon: <Shuffle size={28} /> },
+  { id: 'scanner', title: 'Mind Scanner', description: 'Check your mental fuel level', icon: <Activity size={28} /> },
+  { id: 'archive', title: 'Success Archive', description: 'Your wins and focus milestones', icon: <Trophy size={28} /> },
+  { id: 'chat', title: 'Chat with Oly', description: 'Talk to your ADHD buddy', icon: <MessageCircle size={28} /> },
 ];
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState<ActiveModule>('hub');
-  const { user, signOut } = useAuth();
+  const [showSanctuary, setShowSanctuary] = useState(false);
+  const [showDailySpark, setShowDailySpark] = useState(false);
+  const { user } = useAuth();
   const {
     requestPermission,
-    notifyFocusComplete,
-    notifyTaskComplete,
     startMotivationLoop,
     startFocusReminders,
+    notifyFocusComplete,
     sendToast,
   } = useNotifications();
   const {
@@ -93,13 +56,14 @@ const Index = () => {
     updateUserName,
     addFocusMinutes,
     addTask,
-    toggleTask,
-    removeTask,
     setOlySize,
-    setAmbientSound,
+    addFeathers,
+    purchaseItem,
+    markVisitToday,
+    isFirstVisitToday,
   } = useAppState();
 
-  // Request notification permission and start reminders
+  // Request notification permission
   useEffect(() => {
     requestPermission().then((granted) => {
       if (granted) {
@@ -123,13 +87,25 @@ const Index = () => {
     }
   }, [user]);
 
+  // Daily spark on first visit
+  useEffect(() => {
+    if (isFirstVisitToday()) {
+      setShowDailySpark(true);
+      markVisitToday();
+    }
+  }, []);
+
   const goToHub = () => setActiveModule('hub');
 
-  // Render active module
+  const handleFeatherEarn = (amount: number) => {
+    addFeathers(amount);
+    sendToast('🪶 Feathers Earned!', `+${amount} feathers added to your collection!`);
+  };
+
   const renderModule = () => {
     switch (activeModule) {
       case 'shredder':
-        return <TaskShredder onBack={goToHub} />;
+        return <TaskShredder onBack={goToHub} onFeatherEarn={() => handleFeatherEarn(10)} />;
       case 'focus':
         return (
           <FocusRoom
@@ -137,6 +113,7 @@ const Index = () => {
             onComplete={(minutes) => {
               addFocusMinutes(minutes);
               notifyFocusComplete(minutes);
+              handleFeatherEarn(10);
             }}
           />
         );
@@ -182,10 +159,13 @@ const Index = () => {
   // Hub view
   if (activeModule === 'hub') {
     return (
-      <div className="min-h-screen bg-background p-4 pb-20">
-        {/* Header with greeting */}
+      <div className="min-h-screen bg-background p-4 pb-20 relative">
+        <LivingBackground />
+        <FeatherCounter count={state.feathers} />
+
+        {/* Header */}
         <motion.div
-          className="text-center mb-6"
+          className="text-center mb-6 relative z-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -196,31 +176,35 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">What shall we tackle today?</p>
         </motion.div>
 
-        {/* Oly Character */}
+        {/* Oly with Sanctuary Items & Daily Spark */}
         <motion.div
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-8 relative z-10"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Oly
-            state="neutral"
-            size={state.olySize}
-            onClick={() => {
-              const msgs = [
-                'سلام! امروز چه کاری انجام میدیم؟ 🎯',
-                'آماده‌ای برای یه روز عالی؟ 💪',
-                'هی! بزن بریم یه تسک بزنیم! ✨',
-                'من اینجام، هر وقت آماده بودی! 🌟',
-                'یه نفس عمیق بکش... حالا بزن بریم! 🧘',
-              ];
-              sendToast('🫧 Oly', msgs[Math.floor(Math.random() * msgs.length)]);
-            }}
-          />
+          <div className="relative inline-flex items-center justify-center">
+            <DailySpark show={showDailySpark} onDismiss={() => setShowDailySpark(false)} />
+            <SanctuaryItems purchasedItems={state.purchasedItems} olySize={state.olySize} />
+            <Oly
+              state="neutral"
+              size={state.olySize}
+              onClick={() => {
+                const msgs = [
+                  'سلام! امروز چه کاری انجام میدیم؟ 🎯',
+                  'آماده‌ای برای یه روز عالی؟ 💪',
+                  'هی! بزن بریم یه تسک بزنیم! ✨',
+                  'من اینجام، هر وقت آماده بودی! 🌟',
+                  'یه نفس عمیق بکش... حالا بزن بریم! 🧘',
+                ];
+                sendToast('🫧 Oly', msgs[Math.floor(Math.random() * msgs.length)]);
+              }}
+            />
+          </div>
         </motion.div>
 
         {/* Module Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 relative z-10">
           {modules.map((module, index) => (
             <motion.div
               key={module.id}
@@ -228,11 +212,8 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 * index }}
             >
-              <GlassCard
-                onClick={() => setActiveModule(module.id)}
-                className="h-full"
-              >
-                <div className={`${module.color} mb-2`}>{module.icon}</div>
+              <GlassCard onClick={() => setActiveModule(module.id)} className="h-full">
+                <div className="text-primary mb-2">{module.icon}</div>
                 <h3 className="font-semibold text-foreground text-sm">{module.title}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{module.description}</p>
               </GlassCard>
@@ -240,13 +221,19 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Settings Button */}
+        {/* Bottom Buttons */}
         <motion.div
-          className="fixed bottom-4 right-4"
+          className="fixed bottom-4 right-4 flex gap-2 z-20"
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3, delay: 0.8 }}
         >
+          <button
+            onClick={() => setShowSanctuary(true)}
+            className="glass-card p-3 rounded-full neon-glow hover:scale-110 transition-transform"
+          >
+            <Home size={24} className="text-primary" />
+          </button>
           <button
             onClick={() => setActiveModule('settings')}
             className="glass-card p-3 rounded-full neon-glow hover:scale-110 transition-transform"
@@ -256,12 +243,7 @@ const Index = () => {
         </motion.div>
 
         {/* Quick Stats */}
-        <motion.div
-          className="mt-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
+        <motion.div className="mt-6 relative z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
           <GlassCard hover={false} className="flex justify-around py-3">
             <div className="text-center">
               <div className="text-lg font-bold text-primary">{state.totalFocusMinutes}</div>
@@ -272,26 +254,42 @@ const Index = () => {
               <div className="text-lg font-bold text-primary">{state.tasksCompleted}</div>
               <div className="text-xs text-muted-foreground">Tasks Done</div>
             </div>
+            <div className="w-px bg-border" />
+            <div className="text-center">
+              <div className="text-lg font-bold text-primary">🪶 {state.feathers}</div>
+              <div className="text-xs text-muted-foreground">Feathers</div>
+            </div>
           </GlassCard>
         </motion.div>
+
+        <SanctuaryShop
+          open={showSanctuary}
+          onOpenChange={setShowSanctuary}
+          feathers={state.feathers}
+          purchasedItems={state.purchasedItems}
+          onPurchase={purchaseItem}
+        />
       </div>
     );
   }
 
-  // Module view with animation
+  // Module view
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={activeModule}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
-        className="min-h-screen bg-background"
-      >
-        {renderModule()}
-      </motion.div>
-    </AnimatePresence>
+    <div className="relative">
+      <FeatherCounter count={state.feathers} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeModule}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="min-h-screen bg-background"
+        >
+          {renderModule()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 };
 
