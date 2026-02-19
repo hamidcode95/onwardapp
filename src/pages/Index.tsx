@@ -10,7 +10,7 @@ import { FeatherCounter } from '@/components/FeatherCounter';
 import { LivingBackground } from '@/components/LivingBackground';
 import { DailySpark } from '@/components/DailySpark';
 import { SanctuaryItems } from '@/components/SanctuaryItems';
-import { SanctuaryShop } from '@/components/SanctuaryShop';
+import { SanctuaryRoom } from '@/modules/SanctuaryRoom';
 import { TaskShredder } from '@/modules/TaskShredder';
 import { FocusRoom } from '@/modules/FocusRoom';
 import { BrainDump } from '@/modules/BrainDump';
@@ -42,7 +42,6 @@ const modules: ModuleCard[] = [
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState<ActiveModule>('hub');
-  const [showSanctuary, setShowSanctuary] = useState(false);
   const [showDailySpark, setShowDailySpark] = useState(false);
   const { user } = useAuth();
   const {
@@ -152,6 +151,15 @@ const Index = () => {
         );
       case 'chat':
         return <OlyChat onBack={goToHub} />;
+      case 'sanctuary':
+        return (
+          <SanctuaryRoom
+            onBack={goToHub}
+            feathers={state.feathers}
+            purchasedItems={state.purchasedItems}
+            onPurchase={purchaseItem}
+          />
+        );
       default:
         return null;
     }
@@ -214,13 +222,7 @@ const Index = () => {
               transition={{ duration: 0.3, delay: 0.1 * index }}
             >
               <GlassCard
-                onClick={() => {
-                  if (module.id === 'sanctuary') {
-                    setShowSanctuary(true);
-                  } else {
-                    setActiveModule(module.id);
-                  }
-                }}
+                onClick={() => setActiveModule(module.id)}
                 className={`h-full ${module.id === 'sanctuary' ? 'border border-[hsl(140,50%,55%)] shadow-[0_0_12px_hsla(140,50%,55%,0.3)]' : ''}`}
               >
                 <div className={`mb-2 ${module.id === 'sanctuary' ? 'text-[hsl(45,80%,55%)]' : 'text-primary'}`}>{module.icon}</div>
@@ -266,13 +268,8 @@ const Index = () => {
           </GlassCard>
         </motion.div>
 
-        <SanctuaryShop
-          open={showSanctuary}
-          onOpenChange={setShowSanctuary}
-          feathers={state.feathers}
-          purchasedItems={state.purchasedItems}
-          onPurchase={purchaseItem}
-        />
+
+
       </div>
     );
   }
