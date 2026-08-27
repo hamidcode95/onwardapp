@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, Heart } from 'lucide-react';
 import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
-import { lovable } from '@/integrations/lovable/index';
+import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,15 +13,20 @@ const Auth = () => {
   const handleSignIn = async (provider: 'google' | 'apple') => {
     setLoading(provider);
     try {
-      const { error } = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
       if (error) {
         toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
+        setLoading(null);
       }
+      // On success, Supabase redirects the browser to the provider's
+      // consent screen, so there's nothing else to do here.
     } catch {
       toast({ title: 'Something went wrong', variant: 'destructive' });
-    } finally {
       setLoading(null);
     }
   };
