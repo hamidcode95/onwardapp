@@ -11,7 +11,8 @@ export type OlyState =
   | 'thinking' 
   | 'reveal' 
   | 'low_energy' 
-  | 'high_energy';
+  | 'high_energy'
+  | 'alert';
 
 interface BlobConfig {
   colors: [string, string, string];
@@ -101,6 +102,14 @@ const STATE_CONFIGS: Record<OlyState, BlobConfig> = {
     complexity: 2.5,
     glow: 'hsla(80, 70%, 55%, 0.5)',
     pulseScale: [0.9, 1.12],
+    eyeExpression: 'excited',
+  },
+  alert: {
+    colors: ['hsl(35, 85%, 60%)', 'hsl(20, 80%, 55%)', 'hsl(45, 90%, 65%)'],
+    speed: 1.1,
+    complexity: 1.6,
+    glow: 'hsla(30, 85%, 60%, 0.55)',
+    pulseScale: [0.88, 1.14],
     eyeExpression: 'excited',
   },
 };

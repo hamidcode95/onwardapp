@@ -18,6 +18,15 @@ export interface BrainDumpEntry {
   createdAt: string;
 }
 
+export interface TimeAnchor {
+  id: string;
+  label: string;
+  targetTime: string; // ISO timestamp for when the anchor should fire
+  createdAt: string;
+  fired: boolean;
+  dismissed: boolean;
+}
+
 export interface AppState {
   userName: string;
   totalFocusMinutes: number;
@@ -30,6 +39,7 @@ export interface AppState {
   feathers: number;
   purchasedItems: string[];
   lastVisitDate: string | null;
+  timeAnchors: TimeAnchor[];
 }
 
 const defaultState: AppState = {
@@ -44,6 +54,7 @@ const defaultState: AppState = {
   feathers: 0,
   purchasedItems: [],
   lastVisitDate: null,
+  timeAnchors: [],
 };
 
 const STORAGE_KEY = 'onward_adhd_state';
@@ -190,6 +201,47 @@ export function useAppState() {
     return success;
   }, []);
 
+  const addTimeAnchor = useCallback((label: string, targetTime: string) => {
+    const anchor: TimeAnchor = {
+      id: crypto.randomUUID(),
+      label,
+      targetTime,
+      createdAt: new Date().toISOString(),
+      fired: false,
+      dismissed: false,
+    };
+    setState(prev => ({
+      ...prev,
+      timeAnchors: [...prev.timeAnchors, anchor],
+    }));
+    return anchor;
+  }, []);
+
+  const removeTimeAnchor = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      timeAnchors: prev.timeAnchors.filter(a => a.id !== id),
+    }));
+  }, []);
+
+  const markTimeAnchorFired = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      timeAnchors: prev.timeAnchors.map(a =>
+        a.id === id ? { ...a, fired: true } : a
+      ),
+    }));
+  }, []);
+
+  const dismissTimeAnchor = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      timeAnchors: prev.timeAnchors.map(a =>
+        a.id === id ? { ...a, dismissed: true } : a
+      ),
+    }));
+  }, []);
+
   const markVisitToday = useCallback(() => {
     const today = new Date().toDateString();
     setState(prev => ({ ...prev, lastVisitDate: today }));
@@ -216,6 +268,10 @@ export function useAppState() {
     addFeathers,
     spendFeathers,
     purchaseItem,
+    addTimeAnchor,
+    removeTimeAnchor,
+    markTimeAnchorFired,
+    dismissTimeAnchor,
     markVisitToday,
     isFirstVisitToday,
   };

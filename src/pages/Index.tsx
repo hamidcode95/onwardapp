@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon, AlarmClock } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useTimeAnchors } from '@/hooks/useTimeAnchors';
 import { GlassCard } from '@/components/GlassCard';
 import { Oly } from '@/components/Oly';
 import { FeatherCounter } from '@/components/FeatherCounter';
 import { LivingBackground } from '@/components/LivingBackground';
 import { DailySpark } from '@/components/DailySpark';
 import { SanctuaryItems } from '@/components/SanctuaryItems';
+import { TimeAnchorBanner } from '@/components/TimeAnchorBanner';
+import { AlarmModal } from '@/components/AlarmModal';
 import { SanctuaryRoom } from '@/modules/SanctuaryRoom';
 import { TaskShredder } from '@/modules/TaskShredder';
 import { FocusRoom } from '@/modules/FocusRoom';
@@ -19,8 +22,9 @@ import { MindScanner } from '@/modules/MindScanner';
 import { SuccessArchive } from '@/modules/SuccessArchive';
 import { Settings } from '@/modules/Settings';
 import { OlyChat } from '@/modules/OlyChat';
+import { TimeAnchor } from '@/modules/TimeAnchor';
 
-type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary';
+type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary' | 'anchor';
 
 interface ModuleCard {
   id: ActiveModule;
@@ -38,6 +42,7 @@ const modules: ModuleCard[] = [
   { id: 'archive', title: 'Success Archive', description: 'Your wins and focus milestones', icon: <Trophy size={28} /> },
   { id: 'chat', title: 'Chat with Oly', description: 'Talk to your ADHD buddy', icon: <MessageCircle size={28} /> },
   { id: 'sanctuary' as ActiveModule, title: "Oly's Sanctuary", description: 'Spend feathers, decorate home', icon: <HomeIcon size={28} /> },
+  { id: 'anchor' as ActiveModule, title: 'Time Anchor', description: 'Quick nudges for time-sensitive tasks', icon: <AlarmClock size={28} /> },
 ];
 
 const Index = () => {
@@ -49,6 +54,7 @@ const Index = () => {
     startMotivationLoop,
     startFocusReminders,
     notifyFocusComplete,
+    notify,
     sendToast,
   } = useNotifications();
   const {
@@ -59,9 +65,21 @@ const Index = () => {
     setOlySize,
     addFeathers,
     purchaseItem,
+    addTimeAnchor,
+    removeTimeAnchor,
+    markTimeAnchorFired,
+    dismissTimeAnchor,
     markVisitToday,
     isFirstVisitToday,
   } = useAppState();
+
+  const { nextAnchor, activeAlarm, timeLeftMs, dismissAlarm } = useTimeAnchors({
+    timeAnchors: state.timeAnchors,
+    markTimeAnchorFired,
+    dismissTimeAnchor,
+    addFeathers,
+    notify,
+  });
 
   // Request notification permission
   useEffect(() => {
@@ -160,6 +178,15 @@ const Index = () => {
             onPurchase={purchaseItem}
           />
         );
+      case 'anchor':
+        return (
+          <TimeAnchor
+            onBack={goToHub}
+            anchors={state.timeAnchors}
+            onAdd={addTimeAnchor}
+            onRemove={removeTimeAnchor}
+          />
+        );
       default:
         return null;
     }
@@ -171,6 +198,11 @@ const Index = () => {
       <div className="min-h-screen bg-background p-4 pb-20 relative">
         <LivingBackground />
         <FeatherCounter count={state.feathers} />
+        <TimeAnchorBanner
+          anchor={nextAnchor}
+          timeLeftMs={timeLeftMs}
+          onClick={() => setActiveModule('anchor')}
+        />
 
         {/* Header */}
         <motion.div
@@ -268,8 +300,10 @@ const Index = () => {
           </GlassCard>
         </motion.div>
 
-
-
+        <AlarmModal
+          anchor={activeAlarm}
+          onDismiss={() => activeAlarm && dismissAlarm(activeAlarm.id, true)}
+        />
       </div>
     );
   }
@@ -278,6 +312,13 @@ const Index = () => {
   return (
     <div className="relative">
       <FeatherCounter count={state.feathers} />
+      {activeModule !== 'anchor' && (
+        <TimeAnchorBanner
+          anchor={nextAnchor}
+          timeLeftMs={timeLeftMs}
+          onClick={() => setActiveModule('anchor')}
+        />
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeModule}
@@ -290,6 +331,10 @@ const Index = () => {
           {renderModule()}
         </motion.div>
       </AnimatePresence>
+      <AlarmModal
+        anchor={activeAlarm}
+        onDismiss={() => activeAlarm && dismissAlarm(activeAlarm.id, true)}
+      />
     </div>
   );
 };
