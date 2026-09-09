@@ -1,28 +1,33 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, BellRing, Bell, Check, Loader2 } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { ScrollPicker } from '@/components/ScrollPicker';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TimeAnchor as TimeAnchorType } from '@/hooks/useAppState';
+import { isPushSupported, subscribeToPush } from '@/lib/push';
 
 interface TimeAnchorModuleProps {
   onBack: () => void;
   anchors: TimeAnchorType[];
   onAdd: (label: string, targetTime: string) => void;
   onRemove: (id: string) => void;
+  userId?: string;
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
-export function TimeAnchor({ onBack, anchors, onAdd, onRemove }: TimeAnchorModuleProps) {
+export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnchorModuleProps) {
   const [label, setLabel] = useState('');
   const now = new Date();
   const [hour, setHour] = useState(now.getHours());
   const [minute, setMinute] = useState(now.getMinutes());
+  const [pushStatus, setPushStatus] = useState<'idle' | 'loading' | 'enabled' | 'unsupported' | 'denied'>(
+    'idle'
+  );
 
   const upcomingAnchors = useMemo(
     () =>
@@ -47,6 +52,23 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove }: TimeAnchorModul
     setLabel('');
   };
 
+  const handleEnableBackgroundAlerts = async () => {
+    if (!userId) return;
+    if (!isPushSupported()) {
+      setPushStatus('unsupported');
+      return;
+    }
+    setPushStatus('loading');
+    const result = await subscribeToPush(userId);
+    if (result.ok) {
+      setPushStatus('enabled');
+    } else if ('reason' in result && result.reason === 'denied') {
+      setPushStatus('denied');
+    } else {
+      setPushStatus('unsupported');
+    }
+  };
+
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
@@ -54,6 +76,41 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove }: TimeAnchorModul
         description="Set a quick nudge for anything time-sensitive"
         onBack={onBack}
       />
+
+      <GlassCard className="mb-4" hover={false}>
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 shrink-0 text-primary">
+            {pushStatus === 'enabled' ? <Check size={20} /> : <BellRing size={20} />}
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-foreground">Background alerts</p>
+            <p className="mb-2 text-sm text-muted-foreground">
+              {pushStatus === 'enabled'
+                ? 'Anchors will notify you even if the app is fully closed.'
+                : pushStatus === 'denied'
+                ? 'Notifications are blocked in your browser settings.'
+                : pushStatus === 'unsupported'
+                ? 'Not supported here yet — on iPhone, add Onward to your Home Screen first.'
+                : 'Enable to get nudged even when the app is closed.'}
+            </p>
+            {pushStatus !== 'enabled' && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleEnableBackgroundAlerts}
+                disabled={pushStatus === 'loading'}
+              >
+                {pushStatus === 'loading' ? (
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                ) : (
+                  <Bell size={16} className="mr-2" />
+                )}
+                Enable background alerts
+              </Button>
+            )}
+          </div>
+        </div>
+      </GlassCard>
 
       <GlassCard className="mb-6" hover={false}>
         <label className="mb-2 block text-sm text-muted-foreground">What do you need to do?</label>

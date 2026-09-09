@@ -23,6 +23,7 @@ import { SuccessArchive } from '@/modules/SuccessArchive';
 import { Settings } from '@/modules/Settings';
 import { OlyChat } from '@/modules/OlyChat';
 import { TimeAnchor } from '@/modules/TimeAnchor';
+import { syncAnchorCreate, syncAnchorDismiss, syncAnchorDelete } from '@/lib/anchorSync';
 
 type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary' | 'anchor';
 
@@ -80,6 +81,23 @@ const Index = () => {
     addFeathers,
     notify,
   });
+
+  // Mirrors Time Anchors into Supabase (in addition to local state) so the
+  // background push function can find them even when the app is closed.
+  const handleAddTimeAnchor = (label: string, targetTime: string) => {
+    const anchor = addTimeAnchor(label, targetTime);
+    if (user) syncAnchorCreate({ id: anchor.id, userId: user.id, label, targetTime });
+  };
+
+  const handleRemoveTimeAnchor = (id: string) => {
+    removeTimeAnchor(id);
+    syncAnchorDelete(id);
+  };
+
+  const handleDismissAlarm = (id: string) => {
+    dismissAlarm(id, true);
+    syncAnchorDismiss(id);
+  };
 
   // Request notification permission
   useEffect(() => {
@@ -183,8 +201,9 @@ const Index = () => {
           <TimeAnchor
             onBack={goToHub}
             anchors={state.timeAnchors}
-            onAdd={addTimeAnchor}
-            onRemove={removeTimeAnchor}
+            onAdd={handleAddTimeAnchor}
+            onRemove={handleRemoveTimeAnchor}
+            userId={user?.id}
           />
         );
       default:
@@ -302,7 +321,7 @@ const Index = () => {
 
         <AlarmModal
           anchor={activeAlarm}
-          onDismiss={() => activeAlarm && dismissAlarm(activeAlarm.id, true)}
+          onDismiss={() => activeAlarm && handleDismissAlarm(activeAlarm.id)}
         />
       </div>
     );
@@ -333,7 +352,7 @@ const Index = () => {
       </AnimatePresence>
       <AlarmModal
         anchor={activeAlarm}
-        onDismiss={() => activeAlarm && dismissAlarm(activeAlarm.id, true)}
+        onDismiss={() => activeAlarm && handleDismissAlarm(activeAlarm.id)}
       />
     </div>
   );

@@ -201,9 +201,9 @@ export function useAppState() {
     return success;
   }, []);
 
-  const addTimeAnchor = useCallback((label: string, targetTime: string) => {
+  const addTimeAnchor = useCallback((label: string, targetTime: string, id?: string) => {
     const anchor: TimeAnchor = {
-      id: crypto.randomUUID(),
+      id: id ?? crypto.randomUUID(),
       label,
       targetTime,
       createdAt: new Date().toISOString(),

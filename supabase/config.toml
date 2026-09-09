@@ -2,3 +2,6 @@ project_id = "docxoelzwfoijsghjtql"
 
 [functions.ai-assistant]
 verify_jwt = false
+
+[functions.send-time-anchor-push]
+verify_jwt = false

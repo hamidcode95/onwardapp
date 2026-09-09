@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      time_anchors: {
+        Row: {
+          id: string
+          user_id: string
+          label: string
+          target_time: string
+          fired: boolean
+          dismissed: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          label: string
+          target_time: string
+          fired?: boolean
+          dismissed?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          label?: string
+          target_time?: string
+          fired?: boolean
+          dismissed?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          endpoint: string
+          p256dh: string
+          auth: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          endpoint?: string
+          p256dh?: string
+          auth?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
