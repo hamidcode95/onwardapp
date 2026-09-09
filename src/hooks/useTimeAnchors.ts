@@ -61,7 +61,7 @@ export function useTimeAnchors({
         firingRef.current.add(anchor.id);
         markTimeAnchorFired(anchor.id);
         playOlyNudge();
-        notify('⏰ Oly یادت انداخت!', anchor.label, 'warning');
+        notify('⏰ Oly nudged you!', anchor.label, 'warning');
       }
     });
   }, [pendingAnchors, now, markTimeAnchorFired, notify]);
@@ -72,7 +72,7 @@ export function useTimeAnchors({
       firingRef.current.delete(id);
       if (onTime) {
         addFeathers(FEATHER_REWARD_ON_TIME);
-        notify('🪶 آفرین!', `+${FEATHER_REWARD_ON_TIME} پر برای دیدن به‌موقع Anchor!`, 'success');
+        notify('🪶 Nice!', `+${FEATHER_REWARD_ON_TIME} feathers for catching your Anchor in time!`, 'success');
       }
     },
     [dismissTimeAnchor, addFeathers, notify]

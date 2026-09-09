@@ -29,7 +29,7 @@ export function AlarmModal({ anchor, onDismiss }: AlarmModalProps) {
               <Oly state="alert" size={110} />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-1">
-              ⏰ وقتشه!
+              ⏰ Time's up!
             </h3>
             <p className="text-muted-foreground mb-6">{anchor.label}</p>
             <Button size="lg" className="w-full neon-glow" onClick={onDismiss}>

@@ -74,28 +74,28 @@ export function AddToHomeScreenPrompt() {
           {showIosInstructions ? (
             <div className="pr-6">
               <p className="mb-2 font-semibold text-foreground">
-                برای دریافت یادآوری‌ها حتی وقتی اپ بسته‌ست
+                Get reminders even when the app is closed
               </p>
               <p className="mb-3 text-sm leading-6 text-muted-foreground">
-                Onward رو به صفحه اصلی گوشیت اضافه کن: پایین صفحه دکمه‌ی{' '}
+                Add Onward to your Home Screen: tap the{' '}
                 <Share size={14} className="mx-1 inline align-text-bottom" />
-                Share رو بزن، بعد{' '}
+                Share button below, then{' '}
                 <PlusSquare size={14} className="mx-1 inline align-text-bottom" />
-                «Add to Home Screen» رو انتخاب کن.
+                choose "Add to Home Screen".
               </p>
               <Button size="sm" variant="secondary" onClick={dismiss}>
-                متوجه شدم
+                Got it
               </Button>
             </div>
           ) : (
             <div className="flex items-center justify-between gap-3 pr-6">
               <div>
-                <p className="font-semibold text-foreground">Onward رو نصب کن</p>
-                <p className="text-sm text-muted-foreground">یادآوری‌ها حتی با بسته بودن اپ برات میان</p>
+                <p className="font-semibold text-foreground">Install Onward</p>
+                <p className="text-sm text-muted-foreground">Reminders arrive even when the app is closed</p>
               </div>
               <Button size="sm" onClick={handleInstall} className="shrink-0">
                 <Download size={16} className="mr-1" />
-                نصب
+                Install
               </Button>
             </div>
           )}

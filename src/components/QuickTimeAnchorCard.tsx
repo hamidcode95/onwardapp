@@ -45,7 +45,7 @@ export function QuickTimeAnchorCard({ onAdd, onManage }: QuickTimeAnchorCardProp
           className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <Settings2 size={14} />
-          مدیریت
+          Manage
         </button>
       </div>
 
@@ -53,7 +53,7 @@ export function QuickTimeAnchorCard({ onAdd, onManage }: QuickTimeAnchorCardProp
         <Input
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          placeholder="یادت باشه چیکار کنی..."
+          placeholder="What's the task?"
           className="flex-1"
           onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
         />
