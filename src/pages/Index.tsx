@@ -26,28 +26,28 @@ import { TimeAnchor } from '@/modules/TimeAnchor';
 import { QuickTimeAnchorCard } from '@/components/QuickTimeAnchorCard';
 import { syncAnchorCreate, syncAnchorDismiss, syncAnchorDelete } from '@/lib/anchorSync';
 import { notifications } from '@/lib/notifications';
+import { useTranslation } from 'react-i18next';
 
 type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary' | 'anchor';
 
 interface ModuleCard {
   id: ActiveModule;
-  title: string;
-  description: string;
   icon: React.ReactNode;
 }
 
 const modules: ModuleCard[] = [
-  { id: 'shredder', title: 'Task Shredder', description: 'Break big goals into tiny bites', icon: <Scissors size={28} /> },
-  { id: 'focus', title: 'Focus Room', description: 'Work alongside Oly with visual timers', icon: <Clock size={28} /> },
-  { id: 'dump', title: 'Brain Dump', description: 'Empty your mind instantly', icon: <Brain size={28} /> },
-  { id: 'decision', title: 'Decision Maker', description: 'Let Oly choose your next move', icon: <Shuffle size={28} /> },
-  { id: 'scanner', title: 'Mind Scanner', description: 'Check your mental fuel level', icon: <Activity size={28} /> },
-  { id: 'archive', title: 'Success Archive', description: 'Your wins and focus milestones', icon: <Trophy size={28} /> },
-  { id: 'chat', title: 'Chat with Oly', description: 'Talk to your ADHD buddy', icon: <MessageCircle size={28} /> },
-  { id: 'sanctuary' as ActiveModule, title: "Oly's Sanctuary", description: 'Spend feathers, decorate home', icon: <HomeIcon size={28} /> },
+  { id: 'shredder', icon: <Scissors size={28} /> },
+  { id: 'focus', icon: <Clock size={28} /> },
+  { id: 'dump', icon: <Brain size={28} /> },
+  { id: 'decision', icon: <Shuffle size={28} /> },
+  { id: 'scanner', icon: <Activity size={28} /> },
+  { id: 'archive', icon: <Trophy size={28} /> },
+  { id: 'chat', icon: <MessageCircle size={28} /> },
+  { id: 'sanctuary' as ActiveModule, icon: <HomeIcon size={28} /> },
 ];
 
 const Index = () => {
+  const { t } = useTranslation();
   const [activeModule, setActiveModule] = useState<ActiveModule>('hub');
   const [showDailySpark, setShowDailySpark] = useState(false);
   const { user } = useAuth();
@@ -271,9 +271,9 @@ const Index = () => {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-2xl font-bold text-foreground neon-text">
-            Hey, {state.userName}! 👋
+            {t('dashboard.greeting', { name: state.userName })} 👋
           </h1>
-          <p className="text-muted-foreground mt-1">What shall we tackle today?</p>
+          <p className="text-muted-foreground mt-1">{t('dashboard.subtitle')}</p>
         </motion.div>
 
         {/* Oly with Sanctuary Items & Daily Spark */}
@@ -321,8 +321,8 @@ const Index = () => {
                 className={`h-full ${module.id === 'sanctuary' ? 'border border-[hsl(140,50%,55%)] shadow-[0_0_12px_hsla(140,50%,55%,0.3)]' : ''}`}
               >
                 <div className={`mb-2 ${module.id === 'sanctuary' ? 'text-[hsl(45,80%,55%)]' : 'text-primary'}`}>{module.icon}</div>
-                <h3 className="font-semibold text-foreground text-sm">{module.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{module.description}</p>
+                <h3 className="font-semibold text-foreground text-sm">{t(`dashboard.modules.${module.id}.title`)}</h3>
+                <p className="text-xs text-muted-foreground mt-1">{t(`dashboard.modules.${module.id}.description`)}</p>
               </GlassCard>
             </motion.div>
           ))}

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Oly } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { TimeAnchor } from '@/hooks/useAppState';
+import { useTranslation } from 'react-i18next';
 
 interface AlarmModalProps {
   anchor: TimeAnchor | null;
@@ -9,6 +10,7 @@ interface AlarmModalProps {
 }
 
 export function AlarmModal({ anchor, onDismiss }: AlarmModalProps) {
+  const { t } = useTranslation();
   return (
     <AnimatePresence>
       {anchor && (
@@ -29,11 +31,11 @@ export function AlarmModal({ anchor, onDismiss }: AlarmModalProps) {
               <Oly state="alert" size={110} />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-1">
-              ⏰ Time's up!
+              ⏰ {t('timeAnchor.alarm.timesUp')}
             </h3>
             <p className="text-muted-foreground mb-6">{anchor.label}</p>
             <Button size="lg" className="w-full neon-glow" onClick={onDismiss}>
-              Focus Now
+              {t('timeAnchor.alarm.focusNow')}
             </Button>
           </motion.div>
         </motion.div>

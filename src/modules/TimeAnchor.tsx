@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TimeAnchor as TimeAnchorType } from '@/hooks/useAppState';
 import { notifications } from '@/lib/notifications';
+import { useTranslation } from 'react-i18next';
 
 interface TimeAnchorModuleProps {
   onBack: () => void;
@@ -21,6 +22,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnchorModuleProps) {
+  const { t } = useTranslation();
   const [label, setLabel] = useState('');
   const now = new Date();
   const [hour, setHour] = useState(now.getHours());
@@ -72,8 +74,8 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Time Anchor"
-        description="Set a quick nudge for anything time-sensitive"
+        title={t('timeAnchor.title')}
+        description={t('timeAnchor.subtitle')}
         onBack={onBack}
       />
 
@@ -83,15 +85,15 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
             {pushStatus === 'enabled' ? <Check size={20} /> : <BellRing size={20} />}
           </div>
           <div className="flex-1">
-            <p className="font-medium text-foreground">Background alerts</p>
+            <p className="font-medium text-foreground">{t('timeAnchor.backgroundAlerts.title')}</p>
             <p className="mb-2 text-sm text-muted-foreground">
               {pushStatus === 'enabled'
-                ? 'Anchors will notify you even if the app is fully closed.'
+                ? t('timeAnchor.backgroundAlerts.enabled')
                 : pushStatus === 'denied'
-                ? 'Notifications are blocked in your browser settings.'
+                ? t('timeAnchor.backgroundAlerts.denied')
                 : pushStatus === 'unsupported'
-                ? 'Not supported here yet — on iPhone, add Onward to your Home Screen first.'
-                : 'Enable to get nudged even when the app is closed.'}
+                ? t('timeAnchor.backgroundAlerts.unsupported')
+                : t('timeAnchor.backgroundAlerts.default')}
             </p>
             {pushStatus !== 'enabled' && (
               <Button
@@ -105,7 +107,7 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
                 ) : (
                   <Bell size={16} className="mr-2" />
                 )}
-                Enable background alerts
+                {t('timeAnchor.backgroundAlerts.button')}
               </Button>
             )}
           </div>
@@ -113,16 +115,16 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
       </GlassCard>
 
       <GlassCard className="mb-6" hover={false}>
-        <label className="mb-2 block text-sm text-muted-foreground">What do you need to do?</label>
+        <label className="mb-2 block text-sm text-muted-foreground">{t('timeAnchor.whatToDo')}</label>
         <Input
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          placeholder="e.g. Take medication, Join meeting"
+          placeholder={t('timeAnchor.examplePlaceholder')}
           className="mb-4"
           onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
         />
 
-        <label className="mb-2 block text-sm text-muted-foreground">When?</label>
+        <label className="mb-2 block text-sm text-muted-foreground">{t('timeAnchor.when')}</label>
         <div className="mb-4 flex items-center justify-center gap-2">
           <ScrollPicker values={HOURS} value={hour} onChange={setHour} />
           <span className="text-xl font-bold text-muted-foreground">:</span>
@@ -131,13 +133,13 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
 
         <Button className="w-full neon-glow" onClick={handleAdd} disabled={!label.trim()}>
           <Plus size={18} className="mr-2" />
-          Set Time Anchor
+          {t('timeAnchor.setButton')}
         </Button>
       </GlassCard>
 
       {upcomingAnchors.length > 0 && (
         <div className="space-y-2">
-          <p className="mb-2 text-sm text-muted-foreground">Active anchors</p>
+          <p className="mb-2 text-sm text-muted-foreground">{t('timeAnchor.activeAnchors')}</p>
           {upcomingAnchors.map((anchor, index) => (
             <motion.div
               key={anchor.id}
@@ -150,7 +152,7 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
                   <p className="truncate font-medium text-foreground">{anchor.label}</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(anchor.targetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {anchor.fired ? ' · ringing' : ''}
+                    {anchor.fired ? ` · ${t('timeAnchor.ringing')}` : ''}
                   </p>
                 </div>
                 <button

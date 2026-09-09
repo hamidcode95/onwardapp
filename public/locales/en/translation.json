@@ -1,0 +1,61 @@
+{
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "manage": "Manage",
+    "install": "Install",
+    "gotIt": "Got it"
+  },
+  "dashboard": {
+    "greeting": "Hey, {{name}}!",
+    "subtitle": "What shall we tackle today?",
+    "modules": {
+      "shredder": { "title": "Task Shredder", "description": "Break big goals into tiny bites" },
+      "focus": { "title": "Focus Room", "description": "Work alongside Oly with visual timers" },
+      "dump": { "title": "Brain Dump", "description": "Empty your mind instantly" },
+      "decision": { "title": "Decision Maker", "description": "Let Oly choose your next move" },
+      "scanner": { "title": "Mind Scanner", "description": "Check your mental fuel level" },
+      "archive": { "title": "Success Archive", "description": "Your wins and focus milestones" },
+      "chat": { "title": "Chat with Oly", "description": "Talk to your ADHD buddy" },
+      "sanctuary": { "title": "Oly's Sanctuary", "description": "Spend feathers, decorate home" }
+    }
+  },
+  "feathers": "Feathers",
+  "timeAnchor": {
+    "title": "Time Anchor",
+    "subtitle": "Set a quick nudge for anything time-sensitive",
+    "placeholder": "What's the task?",
+    "whatToDo": "What do you need to do?",
+    "examplePlaceholder": "e.g. Take medication, Join meeting",
+    "when": "When?",
+    "setButton": "Set Time Anchor",
+    "activeAnchors": "Active anchors",
+    "ringing": "ringing",
+    "backgroundAlerts": {
+      "title": "Background alerts",
+      "enabled": "Anchors will notify you even if the app is fully closed.",
+      "denied": "Notifications are blocked in your browser settings.",
+      "unsupported": "Not supported here yet — on iPhone, add Onward to your Home Screen first.",
+      "default": "Enable to get nudged even when the app is closed.",
+      "button": "Enable background alerts"
+    },
+    "alarm": {
+      "timesUp": "Time's up!",
+      "focusNow": "Focus Now"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "english": "English",
+    "persian": "فارسی"
+  },
+  "installPrompt": {
+    "title": "Install Onward",
+    "subtitle": "Get the full experience — reminders that reach you even when the app is closed.",
+    "iosStep1": "Tap the <1>Share</1> button in Safari's toolbar",
+    "iosStep2": "Scroll down and choose <1>Add to Home Screen</1>",
+    "installNow": "Install Now"
+  }
+}

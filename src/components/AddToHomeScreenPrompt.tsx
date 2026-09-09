@@ -4,6 +4,7 @@ import { X, Share, PlusSquare, Download, Sparkles } from 'lucide-react';
 import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
 import { isIos, isInStandaloneMode } from '@/lib/push';
+import { useTranslation, Trans } from 'react-i18next';
 
 const DISMISS_KEY = 'onward_a2hs_dismissed_at';
 const DISMISS_DAYS = 14;
@@ -14,6 +15,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function AddToHomeScreenPrompt() {
+  const { t } = useTranslation();
   const [showIosInstructions, setShowIosInstructions] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
@@ -91,10 +93,10 @@ export function AddToHomeScreenPrompt() {
 
             <h2 className="mb-2 flex items-center justify-center gap-2 text-2xl font-bold text-foreground">
               <Sparkles size={22} className="text-primary" />
-              Install Onward
+              {t('installPrompt.title')}
             </h2>
             <p className="mb-8 text-muted-foreground">
-              Get the full experience — reminders that reach you even when the app is closed.
+              {t('installPrompt.subtitle')}
             </p>
 
             {showIosInstructions ? (
@@ -104,7 +106,7 @@ export function AddToHomeScreenPrompt() {
                     <Share size={18} />
                   </div>
                   <p className="text-sm text-foreground">
-                    Tap the <span className="font-semibold">Share</span> button in Safari's toolbar
+                    <Trans i18nKey="installPrompt.iosStep1" components={{ 1: <span className="font-semibold" /> }} />
                   </p>
                 </div>
                 <div className="glass-card flex items-center gap-4 rounded-xl p-4 text-left">
@@ -112,17 +114,17 @@ export function AddToHomeScreenPrompt() {
                     <PlusSquare size={18} />
                   </div>
                   <p className="text-sm text-foreground">
-                    Scroll down and choose <span className="font-semibold">Add to Home Screen</span>
+                    <Trans i18nKey="installPrompt.iosStep2" components={{ 1: <span className="font-semibold" /> }} />
                   </p>
                 </div>
                 <Button variant="secondary" onClick={dismiss} className="mt-4 w-full">
-                  Got it
+                  {t('common.gotIt')}
                 </Button>
               </div>
             ) : (
               <Button size="lg" onClick={handleInstall} className="w-full neon-glow">
                 <Download size={20} className="mr-2" />
-                Install Now
+                {t('installPrompt.installNow')}
               </Button>
             )}
           </motion.div>

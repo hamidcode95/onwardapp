@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Volume2, Palette, Maximize, LogOut, Bell } from 'lucide-react';
+import { User, Volume2, Palette, Maximize, LogOut, Bell, Languages } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications, loadNotificationSettings, type NotificationSettings } from '@/hooks/useNotifications';
+import { useTranslation } from 'react-i18next';
 
 interface SettingsProps {
   onBack: () => void;
@@ -40,6 +41,7 @@ export function Settings({
   const [notifSettings, setNotifSettings] = useState<NotificationSettings>(loadNotificationSettings);
   const { signOut } = useAuth();
   const { applySettings, sendToast } = useNotifications();
+  const { t, i18n } = useTranslation();
 
   const handleNameSave = () => {
     onUpdateName(localName);
@@ -53,7 +55,7 @@ export function Settings({
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Settings"
+        title={t('settings.title')}
         description="Customize your experience"
         onBack={onBack}
       />
@@ -79,6 +81,32 @@ export function Settings({
           />
           <Button onClick={handleNameSave} variant="outline">
             Save
+          </Button>
+        </div>
+      </GlassCard>
+
+      {/* Language */}
+      <GlassCard className="mb-4" hover={false}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-primary/20">
+            <Languages size={20} className="text-primary" />
+          </div>
+          <h3 className="font-semibold">{t('settings.language')}</h3>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant={i18n.language === 'en' ? 'default' : 'outline'}
+            className="flex-1"
+            onClick={() => i18n.changeLanguage('en')}
+          >
+            {t('settings.english')}
+          </Button>
+          <Button
+            variant={i18n.language === 'fa' ? 'default' : 'outline'}
+            className="flex-1"
+            onClick={() => i18n.changeLanguage('fa')}
+          >
+            {t('settings.persian')}
           </Button>
         </div>
       </GlassCard>

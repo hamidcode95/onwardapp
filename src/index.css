@@ -71,6 +71,11 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  /* Applied to <html> when Persian is active (see src/i18n/config.ts) */
+  html.font-fa body {
+    font-family: 'Vazirmatn', 'Inter', system-ui, sans-serif;
+  }
 }
 
 @layer base {

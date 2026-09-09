@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
       srcDir: "src",
       filename: "sw.ts",
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}", "locales/**/*.json"],
       },
       manifest: {
         name: "Onward - ADHD Focus Companion",

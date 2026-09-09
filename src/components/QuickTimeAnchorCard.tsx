@@ -4,6 +4,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { ScrollPicker } from '@/components/ScrollPicker';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface QuickTimeAnchorCardProps {
   onAdd: (label: string, targetTime: string) => void;
@@ -14,6 +15,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 export function QuickTimeAnchorCard({ onAdd, onManage }: QuickTimeAnchorCardProps) {
+  const { t } = useTranslation();
   const [label, setLabel] = useState('');
   const now = new Date();
   const [hour, setHour] = useState(now.getHours());
@@ -38,14 +40,14 @@ export function QuickTimeAnchorCard({ onAdd, onManage }: QuickTimeAnchorCardProp
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-primary">
           <AlarmClock size={20} />
-          <h3 className="font-semibold text-foreground">Time Anchor</h3>
+          <h3 className="font-semibold text-foreground">{t('timeAnchor.title')}</h3>
         </div>
         <button
           onClick={onManage}
           className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <Settings2 size={14} />
-          Manage
+          {t('common.manage')}
         </button>
       </div>
 
@@ -53,7 +55,7 @@ export function QuickTimeAnchorCard({ onAdd, onManage }: QuickTimeAnchorCardProp
         <Input
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          placeholder="What's the task?"
+          placeholder={t('timeAnchor.placeholder')}
           className="flex-1"
           onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
         />
