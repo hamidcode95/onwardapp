@@ -60,9 +60,29 @@
     @apply border-border;
   }
 
+  html, body {
+    /* Defensive: keeps any fixed-position overlay (toasts, modals) that
+       miscalculates its own width from ever creating a horizontal
+       scrollbar / zoomed-out page on mobile. */
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  /* Sonner's own mobile CSS sets left + right + width:100% together on
+     [data-sonner-toaster], which is over-constrained and makes the toast
+     container ~16px wider than the viewport — the app "oversizes" on
+     Oly's messages. Overriding width here keeps the same 16px side
+     margins without the overflow. */
+  @media (max-width: 600px) {
+    [data-sonner-toaster] {
+      width: calc(100% - 32px) !important;
+    }
   }
 }
 

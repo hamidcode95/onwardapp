@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share, PlusSquare, Download } from 'lucide-react';
+import { X, Share, PlusSquare, Download, Sparkles } from 'lucide-react';
+import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
 import { isIos, isInStandaloneMode } from '@/lib/push';
 
@@ -57,48 +58,74 @@ export function AddToHomeScreenPrompt() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-md rounded-2xl border border-white/10 bg-background/95 p-4 shadow-2xl backdrop-blur-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-black/80 p-6 backdrop-blur-md"
         >
           <button
             onClick={dismiss}
-            className="absolute right-3 top-3 text-muted-foreground transition-colors hover:text-foreground"
+            className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
             aria-label="Dismiss"
           >
-            <X size={16} />
+            <X size={22} />
           </button>
 
-          {showIosInstructions ? (
-            <div className="pr-6">
-              <p className="mb-2 font-semibold text-foreground">
-                Get reminders even when the app is closed
-              </p>
-              <p className="mb-3 text-sm leading-6 text-muted-foreground">
-                Add Onward to your Home Screen: tap the{' '}
-                <Share size={14} className="mx-1 inline align-text-bottom" />
-                Share button below, then{' '}
-                <PlusSquare size={14} className="mx-1 inline align-text-bottom" />
-                choose "Add to Home Screen".
-              </p>
-              <Button size="sm" variant="secondary" onClick={dismiss}>
-                Got it
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between gap-3 pr-6">
-              <div>
-                <p className="font-semibold text-foreground">Install Onward</p>
-                <p className="text-sm text-muted-foreground">Reminders arrive even when the app is closed</p>
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 260 }}
+            className="w-full max-w-sm text-center"
+          >
+            <div className="mb-6 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 animate-pulse-glow rounded-full blur-xl" />
+                <img
+                  src={onwardLogo}
+                  alt="Onward"
+                  className="relative h-28 w-28 rounded-3xl object-cover shadow-2xl"
+                />
               </div>
-              <Button size="sm" onClick={handleInstall} className="shrink-0">
-                <Download size={16} className="mr-1" />
-                Install
-              </Button>
             </div>
-          )}
+
+            <h2 className="mb-2 flex items-center justify-center gap-2 text-2xl font-bold text-foreground">
+              <Sparkles size={22} className="text-primary" />
+              Install Onward
+            </h2>
+            <p className="mb-8 text-muted-foreground">
+              Get the full experience — reminders that reach you even when the app is closed.
+            </p>
+
+            {showIosInstructions ? (
+              <div className="space-y-3">
+                <div className="glass-card flex items-center gap-4 rounded-xl p-4 text-left">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <Share size={18} />
+                  </div>
+                  <p className="text-sm text-foreground">
+                    Tap the <span className="font-semibold">Share</span> button in Safari's toolbar
+                  </p>
+                </div>
+                <div className="glass-card flex items-center gap-4 rounded-xl p-4 text-left">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <PlusSquare size={18} />
+                  </div>
+                  <p className="text-sm text-foreground">
+                    Scroll down and choose <span className="font-semibold">Add to Home Screen</span>
+                  </p>
+                </div>
+                <Button variant="secondary" onClick={dismiss} className="mt-4 w-full">
+                  Got it
+                </Button>
+              </div>
+            ) : (
+              <Button size="lg" onClick={handleInstall} className="w-full neon-glow">
+                <Download size={20} className="mr-2" />
+                Install Now
+              </Button>
+            )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
