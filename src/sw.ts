@@ -29,6 +29,12 @@ self.addEventListener('push', (event) => {
       icon: '/icon-192.png',
       badge: '/icon-192.png',
       data: { anchorId: data.anchorId },
+      // Android/desktop only — iOS Safari ignores both, no true system
+      // "alarm" bypass exists for web push on iOS (that requires Apple's
+      // Critical Alerts entitlement, which no web app can obtain).
+      vibrate: [400, 200, 400, 200, 400],
+      requireInteraction: true,
+      tag: data.anchorId ? `time-anchor-${data.anchorId}` : undefined,
     })
   );
 });

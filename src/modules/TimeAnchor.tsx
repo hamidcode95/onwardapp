@@ -7,7 +7,7 @@ import { ScrollPicker } from '@/components/ScrollPicker';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TimeAnchor as TimeAnchorType } from '@/hooks/useAppState';
-import { isPushSupported, subscribeToPush } from '@/lib/push';
+import { notifications } from '@/lib/notifications';
 
 interface TimeAnchorModuleProps {
   onBack: () => void;
@@ -54,12 +54,12 @@ export function TimeAnchor({ onBack, anchors, onAdd, onRemove, userId }: TimeAnc
 
   const handleEnableBackgroundAlerts = async () => {
     if (!userId) return;
-    if (!isPushSupported()) {
+    if (!notifications.isSupported()) {
       setPushStatus('unsupported');
       return;
     }
     setPushStatus('loading');
-    const result = await subscribeToPush(userId);
+    const result = await notifications.enableBackgroundAlerts(userId);
     if (result.ok) {
       setPushStatus('enabled');
     } else if ('reason' in result && result.reason === 'denied') {

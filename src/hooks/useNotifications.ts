@@ -57,21 +57,18 @@ export function saveNotificationSettings(settings: NotificationSettings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+import { notifications } from '@/lib/notifications';
+
 export function useNotifications() {
   const focusReminderRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const motivationRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const requestPermission = useCallback(async () => {
-    if (!('Notification' in window)) return false;
-    if (Notification.permission === 'granted') return true;
-    const result = await Notification.requestPermission();
-    return result === 'granted';
+    return notifications.requestPermission();
   }, []);
 
   const sendPushNotification = useCallback((title: string, body: string) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/favicon.png', badge: '/favicon.png' });
-    }
+    notifications.showNow(title, body);
   }, []);
 
   const sendToast = useCallback((title: string, body: string, type: 'info' | 'success' | 'warning' = 'info') => {

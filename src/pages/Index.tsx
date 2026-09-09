@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon, AlarmClock } from 'lucide-react';
+import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -23,7 +23,9 @@ import { SuccessArchive } from '@/modules/SuccessArchive';
 import { Settings } from '@/modules/Settings';
 import { OlyChat } from '@/modules/OlyChat';
 import { TimeAnchor } from '@/modules/TimeAnchor';
+import { QuickTimeAnchorCard } from '@/components/QuickTimeAnchorCard';
 import { syncAnchorCreate, syncAnchorDismiss, syncAnchorDelete } from '@/lib/anchorSync';
+import { notifications } from '@/lib/notifications';
 
 type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary' | 'anchor';
 
@@ -43,7 +45,6 @@ const modules: ModuleCard[] = [
   { id: 'archive', title: 'Success Archive', description: 'Your wins and focus milestones', icon: <Trophy size={28} /> },
   { id: 'chat', title: 'Chat with Oly', description: 'Talk to your ADHD buddy', icon: <MessageCircle size={28} /> },
   { id: 'sanctuary' as ActiveModule, title: "Oly's Sanctuary", description: 'Spend feathers, decorate home', icon: <HomeIcon size={28} /> },
-  { id: 'anchor' as ActiveModule, title: 'Time Anchor', description: 'Quick nudges for time-sensitive tasks', icon: <AlarmClock size={28} /> },
 ];
 
 const Index = () => {
@@ -87,17 +88,56 @@ const Index = () => {
   const handleAddTimeAnchor = (label: string, targetTime: string) => {
     const anchor = addTimeAnchor(label, targetTime);
     if (user) syncAnchorCreate({ id: anchor.id, userId: user.id, label, targetTime });
+    notifications.scheduleAt({ id: anchor.id, title: '⏰ Time Anchor', body: label, at: new Date(targetTime) });
   };
 
   const handleRemoveTimeAnchor = (id: string) => {
     removeTimeAnchor(id);
     syncAnchorDelete(id);
+    notifications.cancelScheduled(id);
   };
 
   const handleDismissAlarm = (id: string) => {
     dismissAlarm(id, true);
     syncAnchorDismiss(id);
+    notifications.cancelScheduled(id);
   };
+
+  // Deep link from a tapped push notification (?anchor=<id>) — force the
+  // full-screen alarm experience immediately instead of waiting for the
+  // normal polling loop, and recover the anchor from Supabase if local
+  // state doesn't have it (e.g. after a refresh).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const anchorId = params.get('anchor');
+    if (!anchorId) return;
+
+    // Clean the URL so a later refresh doesn't re-trigger this.
+    window.history.replaceState({}, '', window.location.pathname);
+
+    const existing = state.timeAnchors.find((a) => a.id === anchorId);
+    if (existing) {
+      if (!existing.fired) markTimeAnchorFired(anchorId);
+      return;
+    }
+
+    // Not in local state (different session/refresh) — pull it from the
+    // server mirror so the alarm still shows.
+    import('@/integrations/supabase/client').then(({ supabase }) => {
+      supabase
+        .from('time_anchors')
+        .select('id, label, target_time, dismissed')
+        .eq('id', anchorId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data && !data.dismissed) {
+            const anchor = addTimeAnchor(data.label, data.target_time, data.id);
+            markTimeAnchorFired(anchor.id);
+          }
+        });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Request notification permission
   useEffect(() => {
@@ -265,6 +305,10 @@ const Index = () => {
 
         {/* Module Grid */}
         <div className="grid grid-cols-2 gap-3 relative z-10">
+          <QuickTimeAnchorCard
+            onAdd={handleAddTimeAnchor}
+            onManage={() => setActiveModule('anchor')}
+          />
           {modules.map((module, index) => (
             <motion.div
               key={module.id}
