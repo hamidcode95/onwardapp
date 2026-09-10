@@ -4,6 +4,8 @@ import { ArrowLeft, X } from 'lucide-react';
 import { Oly } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/GlassCard';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 interface ShopItem {
   id: string;
@@ -13,19 +15,23 @@ interface ShopItem {
   description: string;
 }
 
-const SHOP_ITEMS: ShopItem[] = [
-  { id: 'mug', name: 'Brain Fuel Mug', cost: 15, emoji: '☕', description: 'A steaming mug near Oly' },
-  { id: 'plant', name: 'Minimalist Plant', cost: 30, emoji: '🌿', description: 'Line-art sage plant' },
-  { id: 'rug', name: 'Cozy Rug', cost: 50, emoji: '🟤', description: 'A soft rug for the room' },
-  { id: 'lamp', name: 'Focus Lamp', cost: 100, emoji: '💡', description: 'Toggle room brightness' },
-];
+function getShopItems(t: TFunction): ShopItem[] {
+  return [
+    { id: 'mug', name: t('sanctuary.items.mug.name'), cost: 15, emoji: '☕', description: t('sanctuary.items.mug.description') },
+    { id: 'plant', name: t('sanctuary.items.plant.name'), cost: 30, emoji: '🌿', description: t('sanctuary.items.plant.description') },
+    { id: 'rug', name: t('sanctuary.items.rug.name'), cost: 50, emoji: '🟤', description: t('sanctuary.items.rug.description') },
+    { id: 'lamp', name: t('sanctuary.items.lamp.name'), cost: 100, emoji: '💡', description: t('sanctuary.items.lamp.description') },
+  ];
+}
 
-const EARN_GUIDE = [
-  { activity: 'Complete a sub-task', reward: '+10 🪶', icon: '✂️' },
-  { activity: 'Finish a focus session', reward: '+50 🪶', icon: '⏱️' },
-  { activity: 'Daily check-in (coming soon)', reward: '+5 🪶', icon: '📅' },
-  { activity: 'Brain dump entry (coming soon)', reward: '+3 🪶', icon: '🧠' },
-];
+function getEarnGuide(t: TFunction) {
+  return [
+    { activity: t('sanctuary.earnGuide.subtask'), reward: '+10 🪶', icon: '✂️' },
+    { activity: t('sanctuary.earnGuide.focusSession'), reward: '+50 🪶', icon: '⏱️' },
+    { activity: t('sanctuary.earnGuide.checkIn'), reward: '+5 🪶', icon: '📅' },
+    { activity: t('sanctuary.earnGuide.brainDumpEntry'), reward: '+3 🪶', icon: '🧠' },
+  ];
+}
 
 interface SanctuaryRoomProps {
   onBack: () => void;
@@ -200,11 +206,12 @@ function CozyRug() {
   );
 }
 
-function Whiteboard({ onClick, isNight }: { onClick: () => void; isNight: boolean }) {
+function Whiteboard({ onClick, isNight, isRtl }: { onClick: () => void; isNight: boolean; isRtl?: boolean }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       className="absolute z-[5] cursor-pointer"
-      style={{ top: '20%', left: '5%' }}
+      style={{ top: '20%', left: '5%', transform: isRtl ? 'scaleX(-1)' : undefined }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: .95 }}
       onClick={onClick}
@@ -227,7 +234,7 @@ function Whiteboard({ onClick, isNight }: { onClick: () => void; isNight: boolea
           />
         )}
       </svg>
-      <p className="text-[9px] text-muted-foreground text-center mt-0.5 font-medium">How to Earn</p>
+      <p className="text-[9px] text-muted-foreground text-center mt-0.5 font-medium">{t('sanctuary.howToEarn')}</p>
     </motion.div>
   );
 }
@@ -235,6 +242,10 @@ function Whiteboard({ onClick, isNight }: { onClick: () => void; isNight: boolea
 /* ───────── MAIN COMPONENT ───────── */
 
 export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: SanctuaryRoomProps) {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
+  const SHOP_ITEMS = getShopItems(t);
+  const EARN_GUIDE = getEarnGuide(t);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [lampOn, setLampOn] = useState(false);
@@ -278,29 +289,34 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
           {/* Top bar */}
           <div className="absolute top-0 left-0 right-0 z-[30] flex items-center justify-between p-3 sm:p-4">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-foreground gap-2 glass-card">
-              <ArrowLeft size={18} /> Exit
+              <ArrowLeft size={18} /> {t('sanctuary.exit')}
             </Button>
             <div className="glass-card px-3 py-1.5 rounded-full flex items-center gap-2 text-sm font-semibold text-foreground">
               🪶 {feathers}
             </div>
           </div>
 
-          {/* Static elements */}
-          <HorizonWindow timeOfDay={timeOfDay} />
-          <Whiteboard onClick={() => setShowWhiteboard(true)} isNight={isNight} />
+          {/* Room scene — mirrored as a whole for RTL so furniture reads
+              right-to-left; Whiteboard counter-flips itself to keep its
+              text/lines readable (see isRtl prop above). */}
+          <div className="absolute inset-0" style={{ transform: isRtl ? 'scaleX(-1)' : undefined }}>
+            {/* Static elements */}
+            <HorizonWindow timeOfDay={timeOfDay} />
+            <Whiteboard onClick={() => setShowWhiteboard(true)} isNight={isNight} isRtl={isRtl} />
 
-          {/* Oly — center */}
-          <div className="absolute z-[10]" style={{ top: '55%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
-              <Oly state="neutral" size={140} />
-            </motion.div>
+            {/* Oly — center */}
+            <div className="absolute z-[10]" style={{ top: '55%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+                <Oly state="neutral" size={140} />
+              </motion.div>
+            </div>
+
+            {/* Purchased items */}
+            {purchasedItems.includes('plant') && <SagePlant />}
+            {purchasedItems.includes('lamp') && <FocusLamp isNight={isNight} onToggle={() => setLampOn(p => !p)} />}
+            {purchasedItems.includes('mug') && <BrainFuelMug />}
+            {purchasedItems.includes('rug') && <CozyRug />}
           </div>
-
-          {/* Purchased items */}
-          {purchasedItems.includes('plant') && <SagePlant />}
-          {purchasedItems.includes('lamp') && <FocusLamp isNight={isNight} onToggle={() => setLampOn(p => !p)} />}
-          {purchasedItems.includes('mug') && <BrainFuelMug />}
-          {purchasedItems.includes('rug') && <CozyRug />}
         </div>
 
         {/* Floor */}
@@ -308,7 +324,7 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
           <div className="absolute top-0 left-0 right-0 h-px" style={{ backgroundColor: 'hsla(0,0%,100%,.05)' }} />
           <div className="absolute inset-0 flex items-center justify-center">
             <Button onClick={() => setShowShop(true)} className="neon-glow text-base px-6 py-3" size="lg">
-              🛒 Open Shop
+              {t('sanctuary.openShop')}
             </Button>
           </div>
         </div>
@@ -332,7 +348,7 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
               <button onClick={() => setShowWhiteboard(false)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
                 <X size={20} />
               </button>
-              <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">🪶 How to Earn Feathers</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">{t('sanctuary.howToEarnFeathers')}</h3>
               <div className="space-y-3">
                 {EARN_GUIDE.map((item, i) => (
                   <div key={i} className="flex items-center justify-between text-gray-700 text-sm">
@@ -341,7 +357,7 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 text-center mt-4">Keep going — every feather counts!</p>
+              <p className="text-xs text-gray-400 text-center mt-4">{t('sanctuary.keepGoing')}</p>
             </motion.div>
           </motion.div>
         )}
@@ -361,8 +377,8 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <div className="text-center mb-4">
-                <h3 className="text-lg font-bold text-foreground neon-text">🏡 Sanctuary Shop</h3>
-                <p className="text-xs text-muted-foreground mt-1">Decorate Oly's room</p>
+                <h3 className="text-lg font-bold text-foreground neon-text">{t('sanctuary.shopTitle')}</h3>
+                <p className="text-xs text-muted-foreground mt-1">{t('sanctuary.shopSubtitle')}</p>
                 <span className="text-base font-bold text-primary mt-1 inline-block">🪶 {feathers}</span>
               </div>
               <div className="space-y-3">
@@ -380,7 +396,7 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
                           </div>
                         </div>
                         {owned ? (
-                          <span className="text-xs text-primary font-semibold px-3 py-1 rounded-full border border-primary/30">✓ Owned</span>
+                          <span className="text-xs text-primary font-semibold px-3 py-1 rounded-full border border-primary/30">{t('sanctuary.owned')}</span>
                         ) : (
                           <Button size="sm" disabled={!canAfford} className={canAfford ? 'neon-glow' : ''} onClick={() => onPurchase(item.id, item.cost)}>
                             🪶 {item.cost}

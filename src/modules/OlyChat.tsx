@@ -7,6 +7,7 @@ import { Oly } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAI } from '@/hooks/useAI';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   id: string;
@@ -19,11 +20,12 @@ interface OlyChatProps {
 }
 
 export function OlyChat({ onBack }: OlyChatProps) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hey! 👋 I'm Oly, your ADHD buddy. How are you feeling today? I'm here to chat, help you through rough patches, or just be a friendly presence! 🌟",
+      content: t('olyChat.welcome'),
     },
   ]);
   const [input, setInput] = useState('');
@@ -65,8 +67,8 @@ export function OlyChat({ onBack }: OlyChatProps) {
   return (
     <div className="min-h-screen p-4 flex flex-col">
       <ModuleHeader
-        title="Chat with Oly"
-        description="Your ADHD buddy is here to chat"
+        title={t('dashboard.modules.chat.title')}
+        description={t('olyChat.subtitle')}
         onBack={onBack}
       />
 
@@ -119,7 +121,7 @@ export function OlyChat({ onBack }: OlyChatProps) {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={t('olyChat.placeholder')}
             className="bg-background/50 border-border"
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             disabled={isLoading}

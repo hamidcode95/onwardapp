@@ -91,6 +91,33 @@
       "taskLegend": { "title": "Task Legend", "description": "Complete 100 tasks" }
     }
   },
+  "olyChat": {
+    "subtitle": "Your ADHD buddy is here to chat",
+    "welcome": "Hey! 👋 I'm Oly, your ADHD buddy. How are you feeling today? I'm here to chat, help you through rough patches, or just be a friendly presence! 🌟",
+    "placeholder": "Type a message..."
+  },
+  "sanctuary": {
+    "exit": "Exit",
+    "openShop": "🛒 Open Shop",
+    "howToEarnFeathers": "🪶 How to Earn Feathers",
+    "howToEarn": "How to Earn",
+    "keepGoing": "Keep going — every feather counts!",
+    "shopTitle": "🏡 Sanctuary Shop",
+    "shopSubtitle": "Decorate Oly's room",
+    "owned": "✓ Owned",
+    "items": {
+      "mug": { "name": "Brain Fuel Mug", "description": "A steaming mug near Oly" },
+      "plant": { "name": "Minimalist Plant", "description": "Line-art sage plant" },
+      "rug": { "name": "Cozy Rug", "description": "A soft rug for the room" },
+      "lamp": { "name": "Focus Lamp", "description": "Toggle room brightness" }
+    },
+    "earnGuide": {
+      "subtask": "Complete a sub-task",
+      "focusSession": "Finish a focus session",
+      "checkIn": "Daily check-in (coming soon)",
+      "brainDumpEntry": "Brain dump entry (coming soon)"
+    }
+  },
   "timeAnchor": {
     "title": "Time Anchor",
     "subtitle": "Set a quick nudge for anything time-sensitive",
