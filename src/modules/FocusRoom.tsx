@@ -5,6 +5,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly, OlyState } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface FocusRoomProps {
   onBack: () => void;
@@ -13,13 +14,18 @@ interface FocusRoomProps {
 
 type TimerOption = { label: string; minutes: number };
 
-const TIMER_OPTIONS: TimerOption[] = [
-  { label: '15m Sprint', minutes: 15 },
-  { label: '25m Deep Work', minutes: 25 },
-  { label: '45m Epic', minutes: 45 },
+const TIMER_OPTION_KEYS: { key: string; minutes: number }[] = [
+  { key: 'sprint15', minutes: 15 },
+  { key: 'deepWork25', minutes: 25 },
+  { key: 'epic45', minutes: 45 },
 ];
 
 export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
+  const { t } = useTranslation();
+  const TIMER_OPTIONS: TimerOption[] = TIMER_OPTION_KEYS.map(({ key, minutes }) => ({
+    label: t(`focusRoom.${key}`),
+    minutes,
+  }));
   const [selectedTimer, setSelectedTimer] = useState<TimerOption | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -85,8 +91,8 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Focus Room"
-        description="Work alongside Oly with visual timers"
+        title={t('dashboard.modules.focus.title')}
+        description={t('dashboard.modules.focus.description')}
         onBack={onBack}
       />
 
@@ -120,7 +126,7 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
       {!selectedTimer ? (
         <div className="space-y-3">
           <p className="text-center text-muted-foreground mb-4">
-            Choose your focus session:
+            {t('focusRoom.chooseSession')}
           </p>
           {TIMER_OPTIONS.map((option) => (
             <GlassCard
@@ -141,7 +147,7 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
             className="glass-card border-border"
           >
             <RotateCcw size={20} className="mr-2" />
-            Reset
+            {t('focusRoom.reset')}
           </Button>
           {!isComplete && (
             <Button
@@ -150,7 +156,7 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
               className="neon-glow"
             >
               {isRunning ? <Pause size={20} className="mr-2" /> : <Play size={20} className="mr-2" />}
-              {isRunning ? 'Pause' : 'Resume'}
+              {isRunning ? t('focusRoom.pause') : t('focusRoom.resume')}
             </Button>
           )}
         </div>
@@ -164,9 +170,9 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
           className="text-center mt-6"
         >
           <GlassCard className="neon-glow" hover={false}>
-            <h3 className="text-xl font-bold text-primary mb-2">🎉 Session Complete!</h3>
+            <h3 className="text-xl font-bold text-primary mb-2">{t('focusRoom.sessionComplete')}</h3>
             <p className="text-muted-foreground">
-              You focused for {selectedTimer?.minutes} minutes. Great work!
+              {t('focusRoom.focusedFor', { minutes: selectedTimer?.minutes })}
             </p>
           </GlassCard>
         </motion.div>

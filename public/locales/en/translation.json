@@ -22,6 +22,39 @@
     }
   },
   "feathers": "Feathers",
+  "taskShredder": {
+    "inputPlaceholder": "Enter a big task to shred...",
+    "aiAutoShred": "AI Auto-Shred",
+    "aiHint": "✨ Click the sparkle button to let AI break down your task automatically!",
+    "subTaskPlaceholder": "Add a sub-task...",
+    "emptyState": "No tasks yet. Add a big task and let AI shred it! ✨"
+  },
+  "focusRoom": {
+    "chooseSession": "Choose your focus session:",
+    "sprint15": "15m Sprint",
+    "deepWork25": "25m Deep Work",
+    "epic45": "45m Epic",
+    "reset": "Reset",
+    "pause": "Pause",
+    "resume": "Resume",
+    "sessionComplete": "🎉 Session Complete!",
+    "focusedFor": "You focused for {{minutes}} minutes. Great work!"
+  },
+  "brainDump": {
+    "placeholder": "What's on your mind? Just dump it here...",
+    "dumpIt": "Dump It",
+    "toShredder": "To Shredder",
+    "emptyState": "No thoughts saved yet. Start dumping!"
+  },
+  "decisionMaker": {
+    "olySays": "Oly says:",
+    "chooseAgain": "Choose Again",
+    "addOption": "Add an option...",
+    "thinking": "Oly is thinking...",
+    "randomPick": "Random Pick",
+    "letAiDecide": "Let AI Decide",
+    "addAtLeastTwo": "Add at least 2 options to let Oly decide"
+  },
   "timeAnchor": {
     "title": "Time Anchor",
     "subtitle": "Set a quick nudge for anything time-sensitive",

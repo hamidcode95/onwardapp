@@ -6,6 +6,7 @@ import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from 'react-i18next';
 
 interface Thought {
   id: string;
@@ -19,6 +20,7 @@ interface BrainDumpProps {
 }
 
 export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
+  const { t } = useTranslation();
   const [thoughts, setThoughts] = useState<Thought[]>(() => {
     const saved = localStorage.getItem('brain_dump_thoughts');
     return saved ? JSON.parse(saved) : [];
@@ -58,8 +60,8 @@ export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Brain Dump"
-        description="Empty your mind instantly"
+        title={t('dashboard.modules.dump.title')}
+        description={t('dashboard.modules.dump.description')}
         onBack={onBack}
       />
 
@@ -72,7 +74,7 @@ export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
         <Textarea
           value={newThought}
           onChange={(e) => setNewThought(e.target.value)}
-          placeholder="What's on your mind? Just dump it here..."
+          placeholder={t('brainDump.placeholder')}
           className="bg-background/50 border-border min-h-[100px] resize-none"
         />
         <Button
@@ -81,7 +83,7 @@ export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
           disabled={!newThought.trim()}
         >
           <Plus size={20} className="mr-2" />
-          Dump It
+          {t('brainDump.dumpIt')}
         </Button>
       </GlassCard>
 
@@ -110,7 +112,7 @@ export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
                         className="text-xs"
                       >
                         <ArrowRight size={14} className="mr-1" />
-                        To Shredder
+                        {t('brainDump.toShredder')}
                       </Button>
                     )}
                     <Button
@@ -131,7 +133,7 @@ export function BrainDump({ onBack, onMoveToShredder }: BrainDumpProps) {
 
       {thoughts.length === 0 && (
         <div className="text-center text-muted-foreground mt-4">
-          <p>No thoughts saved yet. Start dumping!</p>
+          <p>{t('brainDump.emptyState')}</p>
         </div>
       )}
     </div>

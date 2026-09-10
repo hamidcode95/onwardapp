@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAI } from '@/hooks/useAI';
+import { useTranslation } from 'react-i18next';
 
 interface Task {
   id: string;
@@ -22,6 +23,7 @@ interface TaskShredderProps {
 }
 
 export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState('');
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
@@ -124,8 +126,8 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Task Shredder"
-        description="Break big goals into tiny bites"
+        title={t('dashboard.modules.shredder.title')}
+        description={t('dashboard.modules.shredder.description')}
         onBack={onBack}
       />
 
@@ -139,7 +141,7 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
           <Input
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Enter a big task to shred..."
+            placeholder={t('taskShredder.inputPlaceholder')}
             className="bg-background/50 border-border"
             onKeyDown={(e) => e.key === 'Enter' && addTask()}
             disabled={isLoading}
@@ -158,7 +160,7 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
             size="icon" 
             className="shrink-0 neon-glow"
             disabled={isLoading || !newTask.trim()}
-            title="AI Auto-Shred"
+            title={t('taskShredder.aiAutoShred')}
           >
             {isLoading ? (
               <Loader2 size={20} className="animate-spin" />
@@ -168,7 +170,7 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          ✨ Click the sparkle button to let AI break down your task automatically!
+          {t('taskShredder.aiHint')}
         </p>
       </GlassCard>
 
@@ -224,7 +226,7 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
                           <Input
                             value={newSubTask}
                             onChange={(e) => setNewSubTask(e.target.value)}
-                            placeholder="Add a sub-task..."
+                            placeholder={t('taskShredder.subTaskPlaceholder')}
                             className="bg-background/50 border-border text-sm"
                             onKeyDown={(e) => e.key === 'Enter' && addSubTask(task.id)}
                           />
@@ -268,7 +270,7 @@ export function TaskShredder({ onBack, onFeatherEarn }: TaskShredderProps) {
 
       {tasks.length === 0 && (
         <div className="text-center text-muted-foreground mt-8">
-          <p>No tasks yet. Add a big task and let AI shred it! ✨</p>
+          <p>{t('taskShredder.emptyState')}</p>
         </div>
       )}
     </div>
