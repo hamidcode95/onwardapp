@@ -55,6 +55,42 @@
     "letAiDecide": "Let AI Decide",
     "addAtLeastTwo": "Add at least 2 options to let Oly decide"
   },
+  "mindScanner": {
+    "empty": "Empty",
+    "full": "Full",
+    "getAiSuggestion": "Get AI Suggestion",
+    "quickRecommendations": "Quick Recommendations",
+    "energyLabels": {
+      "low": "Low Energy",
+      "moderate": "Moderate",
+      "good": "Good",
+      "full": "Fully Charged!"
+    },
+    "recommendations": {
+      "rest": { "title": "Take a Rest", "description": "Your dopamine tank is low. Consider a short nap or break." },
+      "gentleFuel": { "title": "Gentle Fuel", "description": "Have some water or a light snack." },
+      "microTasks": { "title": "Micro-Tasks", "description": "Try the 15m Sprint in Focus Room for a quick win." },
+      "brainDump": { "title": "Brain Dump", "description": "Clear your mind in Brain Dump to feel lighter." },
+      "deepWork": { "title": "Deep Work", "description": "You're in a good zone! Try a 25m Deep Work session." },
+      "taskShredding": { "title": "Task Shredding", "description": "Great time to break down that big project." },
+      "epicMode": { "title": "Epic Mode", "description": "You're charged! Go for a 45m Epic focus session." },
+      "bigGoals": { "title": "Big Goals", "description": "Perfect time to tackle your most challenging task." }
+    }
+  },
+  "successArchive": {
+    "focusMinutes": "Focus Minutes",
+    "tasksDone": "Tasks Done",
+    "badges": "Badges",
+    "unlocked": "✓ Unlocked",
+    "badgeList": {
+      "firstFocus": { "title": "First Focus", "description": "Complete your first focus session" },
+      "hourMaster": { "title": "Hour Master", "description": "Focus for 1 hour total" },
+      "taskStarter": { "title": "Task Starter", "description": "Complete 5 tasks" },
+      "taskMachine": { "title": "Task Machine", "description": "Complete 25 tasks" },
+      "focusChampion": { "title": "Focus Champion", "description": "Focus for 10 hours total" },
+      "taskLegend": { "title": "Task Legend", "description": "Complete 100 tasks" }
+    }
+  },
   "timeAnchor": {
     "title": "Time Anchor",
     "subtitle": "Set a quick nudge for anything time-sensitive",

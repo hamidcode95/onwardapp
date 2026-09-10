@@ -55,6 +55,42 @@
     "letAiDecide": "بذار AI تصمیم بگیره",
     "addAtLeastTwo": "حداقل ۲ گزینه اضافه کن تا اولی تصمیم بگیره"
   },
+  "mindScanner": {
+    "empty": "خالی",
+    "full": "پر",
+    "getAiSuggestion": "پیشنهاد از AI بگیر",
+    "quickRecommendations": "پیشنهادهای سریع",
+    "energyLabels": {
+      "low": "انرژی کم",
+      "moderate": "متوسط",
+      "good": "خوب",
+      "full": "کاملاً شارژ!"
+    },
+    "recommendations": {
+      "rest": { "title": "یه استراحت کن", "description": "مخزن دوپامینت خالیه. یه چرت کوتاه یا استراحت بزن." },
+      "gentleFuel": { "title": "سوخت‌گیری ملایم", "description": "یکم آب بخور یا یه میان‌وعده‌ی سبک بردار." },
+      "microTasks": { "title": "کارهای ریز", "description": "اسپرینت ۱۵ دقیقه‌ای رو توی اتاق تمرکز امتحان کن." },
+      "brainDump": { "title": "تخلیه ذهن", "description": "توی تخلیه ذهن، ذهنت رو خالی کن تا سبک‌تر بشی." },
+      "deepWork": { "title": "کار عمیق", "description": "تو حالت خوبی هستی! یه جلسه‌ی کار عمیق ۲۵ دقیقه‌ای امتحان کن." },
+      "taskShredding": { "title": "خرد کردن تسک", "description": "زمان خوبیه که اون پروژه‌ی بزرگ رو خرد کنی." },
+      "epicMode": { "title": "حالت حماسی", "description": "شارژی! برو سراغ یه جلسه‌ی تمرکز ۴۵ دقیقه‌ای حماسی." },
+      "bigGoals": { "title": "اهداف بزرگ", "description": "زمان عالیه برای سراغ رفتن چالش‌برانگیزترین کارت." }
+    }
+  },
+  "successArchive": {
+    "focusMinutes": "دقایق تمرکز",
+    "tasksDone": "کارهای انجام‌شده",
+    "badges": "نشان‌ها",
+    "unlocked": "✓ باز شده",
+    "badgeList": {
+      "firstFocus": { "title": "اولین تمرکز", "description": "اولین جلسه‌ی تمرکزت رو تموم کن" },
+      "hourMaster": { "title": "استاد یک ساعت", "description": "در مجموع ۱ ساعت تمرکز کن" },
+      "taskStarter": { "title": "شروع‌کننده", "description": "۵ تا کار رو تموم کن" },
+      "taskMachine": { "title": "ماشین کار", "description": "۲۵ تا کار رو تموم کن" },
+      "focusChampion": { "title": "قهرمان تمرکز", "description": "در مجموع ۱۰ ساعت تمرکز کن" },
+      "taskLegend": { "title": "افسانه‌ی کار", "description": "۱۰۰ تا کار رو تموم کن" }
+    }
+  },
   "timeAnchor": {
     "title": "لنگر زمانی",
     "subtitle": "برای هر کار زمان‌داری یه یادآوری سریع بذار",

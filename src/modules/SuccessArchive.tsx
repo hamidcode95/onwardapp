@@ -3,6 +3,8 @@ import { Trophy, Clock, CheckCircle, TrendingUp } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 interface SuccessArchiveProps {
   onBack: () => void;
@@ -19,49 +21,50 @@ interface Badge {
 }
 
 export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: SuccessArchiveProps) {
+  const { t } = useTranslation();
   const focusHours = Math.floor(totalFocusMinutes / 60);
 
   const badges: Badge[] = [
     {
       id: 'first_focus',
       icon: <Clock size={24} />,
-      title: 'First Focus',
-      description: 'Complete your first focus session',
+      title: t('successArchive.badgeList.firstFocus.title'),
+      description: t('successArchive.badgeList.firstFocus.description'),
       unlocked: totalFocusMinutes > 0,
     },
     {
       id: 'hour_master',
       icon: <Trophy size={24} />,
-      title: 'Hour Master',
-      description: 'Focus for 1 hour total',
+      title: t('successArchive.badgeList.hourMaster.title'),
+      description: t('successArchive.badgeList.hourMaster.description'),
       unlocked: focusHours >= 1,
     },
     {
       id: 'task_starter',
       icon: <CheckCircle size={24} />,
-      title: 'Task Starter',
-      description: 'Complete 5 tasks',
+      title: t('successArchive.badgeList.taskStarter.title'),
+      description: t('successArchive.badgeList.taskStarter.description'),
       unlocked: tasksCompleted >= 5,
     },
     {
       id: 'task_machine',
       icon: <TrendingUp size={24} />,
-      title: 'Task Machine',
-      description: 'Complete 25 tasks',
+      title: t('successArchive.badgeList.taskMachine.title'),
+      description: t('successArchive.badgeList.taskMachine.description'),
       unlocked: tasksCompleted >= 25,
     },
     {
       id: 'focus_champion',
       icon: <Trophy size={24} />,
-      title: 'Focus Champion',
-      description: 'Focus for 10 hours total',
+      title: t('successArchive.badgeList.focusChampion.title'),
+      description: t('successArchive.badgeList.focusChampion.description'),
       unlocked: focusHours >= 10,
     },
     {
       id: 'task_legend',
       icon: <Trophy size={24} />,
-      title: 'Task Legend',
-      description: 'Complete 100 tasks',
+      title: t('successArchive.badgeList.taskLegend.title'),
+      description: t('successArchive.badgeList.taskLegend.description'),
       unlocked: tasksCompleted >= 100,
     },
   ];
@@ -71,8 +74,8 @@ export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: Su
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Success Archive"
-        description="Your wins and focus milestones"
+        title={t('dashboard.modules.archive.title')}
+        description={t('dashboard.modules.archive.description')}
         onBack={onBack}
       />
 
@@ -86,21 +89,21 @@ export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: Su
           <div className="text-center">
             <Clock size={24} className="mx-auto mb-2 text-primary" />
             <div className="text-2xl font-bold text-primary">{totalFocusMinutes}</div>
-            <div className="text-xs text-muted-foreground">Focus Minutes</div>
+            <div className="text-xs text-muted-foreground">{t('successArchive.focusMinutes')}</div>
           </div>
         </GlassCard>
         <GlassCard hover={false}>
           <div className="text-center">
             <CheckCircle size={24} className="mx-auto mb-2 text-primary" />
             <div className="text-2xl font-bold text-primary">{tasksCompleted}</div>
-            <div className="text-xs text-muted-foreground">Tasks Done</div>
+            <div className="text-xs text-muted-foreground">{t('successArchive.tasksDone')}</div>
           </div>
         </GlassCard>
       </div>
 
       {/* Badges */}
       <h3 className="text-lg font-semibold mb-3 text-foreground">
-        Badges ({unlockedCount}/{badges.length})
+        {t('successArchive.badges')} ({unlockedCount}/{badges.length})
       </h3>
       <div className="grid grid-cols-2 gap-3">
         {badges.map((badge, index) => (
@@ -125,7 +128,7 @@ export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: Su
                   {badge.description}
                 </p>
                 {badge.unlocked && (
-                  <span className="inline-block mt-2 text-xs text-primary">✓ Unlocked</span>
+                  <span className="inline-block mt-2 text-xs text-primary">{t('successArchive.unlocked')}</span>
                 )}
               </div>
             </GlassCard>

@@ -7,6 +7,7 @@ import { Oly, OlyState } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAI } from '@/hooks/useAI';
+import { useTranslation } from 'react-i18next';
 
 interface Option {
   id: string;
@@ -19,6 +20,7 @@ interface DecisionMakerProps {
 }
 
 export function DecisionMaker({ onBack }: DecisionMakerProps) {
+  const { t } = useTranslation();
   const [options, setOptions] = useState<Option[]>([]);
   const [newOption, setNewOption] = useState('');
   const [isThinking, setIsThinking] = useState(false);
@@ -102,8 +104,8 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Decision Maker"
-        description="Let Oly choose your next move"
+        title={t('dashboard.modules.decision.title')}
+        description={t('dashboard.modules.decision.description')}
         onBack={onBack}
       />
 
@@ -126,7 +128,7 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
             className="mb-6"
           >
             <GlassCard className="neon-glow text-center" hover={false}>
-              <h3 className="text-sm text-muted-foreground mb-2">Oly says:</h3>
+              <h3 className="text-sm text-muted-foreground mb-2">{t('decisionMaker.olySays')}</h3>
               <p className="text-2xl font-bold text-primary neon-text">{result.text}</p>
               {aiReason && (
                 <p className="text-sm text-muted-foreground mt-2 italic">
@@ -139,7 +141,7 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
                 className="mt-4"
               >
                 <Shuffle size={16} className="mr-2" />
-                Choose Again
+                {t('decisionMaker.chooseAgain')}
               </Button>
             </GlassCard>
           </motion.div>
@@ -154,7 +156,7 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
               <Input
                 value={newOption}
                 onChange={(e) => setNewOption(e.target.value)}
-                placeholder="Add an option..."
+                placeholder={t('decisionMaker.addOption')}
                 className="bg-background/50 border-border"
                 onKeyDown={(e) => e.key === 'Enter' && addOption()}
               />
@@ -226,7 +228,7 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
                 ) : (
                   <Shuffle size={20} className="mr-2" />
                 )}
-                {isThinking ? 'Oly is thinking...' : 'Random Pick'}
+                {isThinking ? t('decisionMaker.thinking') : t('decisionMaker.randomPick')}
               </Button>
               
               <Button
@@ -241,14 +243,14 @@ export function DecisionMaker({ onBack }: DecisionMakerProps) {
                 ) : (
                   <Sparkles size={20} className="mr-2" />
                 )}
-                Let AI Decide
+                {t('decisionMaker.letAiDecide')}
               </Button>
             </div>
           )}
 
           {options.length < 2 && (
             <p className="text-center text-muted-foreground">
-              Add at least 2 options to let Oly decide
+              {t('decisionMaker.addAtLeastTwo')}
             </p>
           )}
         </>

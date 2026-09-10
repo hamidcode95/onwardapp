@@ -7,6 +7,8 @@ import { Oly, OlyState } from '@/components/Oly';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { useAI } from '@/hooks/useAI';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 interface MindScannerProps {
   onBack: () => void;
@@ -19,6 +21,7 @@ interface Recommendation {
 }
 
 export function MindScanner({ onBack }: MindScannerProps) {
+  const { t } = useTranslation();
   const [energyLevel, setEnergyLevel] = useState([50]);
   const [aiSuggestion, setAiSuggestion] = useState<{
     suggestion: string;
@@ -32,28 +35,32 @@ export function MindScanner({ onBack }: MindScannerProps) {
     return energyLevel[0] < 40 ? 'neutral' : 'success';
   };
 
-  const getRecommendations = (): Recommendation[] => {
+  const getRecommendations = (t: TFunction): Recommendation[] => {
     const level = energyLevel[0];
+    const r = (key: string) => ({
+      title: t(`mindScanner.recommendations.${key}.title`),
+      description: t(`mindScanner.recommendations.${key}.description`),
+    });
 
     if (level < 25) {
       return [
-        { icon: <Moon size={20} />, title: 'Take a Rest', description: 'Your dopamine tank is low. Consider a short nap or break.' },
-        { icon: <Coffee size={20} />, title: 'Gentle Fuel', description: 'Have some water or a light snack.' },
+        { icon: <Moon size={20} />, ...r('rest') },
+        { icon: <Coffee size={20} />, ...r('gentleFuel') },
       ];
     } else if (level < 50) {
       return [
-        { icon: <Coffee size={20} />, title: 'Micro-Tasks', description: 'Try the 15m Sprint in Focus Room for a quick win.' },
-        { icon: <Battery size={20} />, title: 'Brain Dump', description: 'Clear your mind in Brain Dump to feel lighter.' },
+        { icon: <Coffee size={20} />, ...r('microTasks') },
+        { icon: <Battery size={20} />, ...r('brainDump') },
       ];
     } else if (level < 75) {
       return [
-        { icon: <Zap size={20} />, title: 'Deep Work', description: 'You\'re in a good zone! Try a 25m Deep Work session.' },
-        { icon: <Battery size={20} />, title: 'Task Shredding', description: 'Great time to break down that big project.' },
+        { icon: <Zap size={20} />, ...r('deepWork') },
+        { icon: <Battery size={20} />, ...r('taskShredding') },
       ];
     } else {
       return [
-        { icon: <Zap size={20} />, title: 'Epic Mode', description: 'You\'re charged! Go for a 45m Epic focus session.' },
-        { icon: <Battery size={20} />, title: 'Big Goals', description: 'Perfect time to tackle your most challenging task.' },
+        { icon: <Zap size={20} />, ...r('epicMode') },
+        { icon: <Battery size={20} />, ...r('bigGoals') },
       ];
     }
   };
@@ -67,10 +74,10 @@ export function MindScanner({ onBack }: MindScannerProps) {
 
   const getEnergyLabel = () => {
     const level = energyLevel[0];
-    if (level < 25) return 'Low Energy';
-    if (level < 50) return 'Moderate';
-    if (level < 75) return 'Good';
-    return 'Fully Charged!';
+    if (level < 25) return t('mindScanner.energyLabels.low');
+    if (level < 50) return t('mindScanner.energyLabels.moderate');
+    if (level < 75) return t('mindScanner.energyLabels.good');
+    return t('mindScanner.energyLabels.full');
   };
 
   const getAISuggestion = async () => {
@@ -84,8 +91,8 @@ export function MindScanner({ onBack }: MindScannerProps) {
   return (
     <div className="min-h-screen p-4">
       <ModuleHeader
-        title="Mind Scanner"
-        description="Check your mental fuel level"
+        title={t('dashboard.modules.scanner.title')}
+        description={t('dashboard.modules.scanner.description')}
         onBack={onBack}
       />
 
@@ -109,8 +116,8 @@ export function MindScanner({ onBack }: MindScannerProps) {
 
         <div className="px-2">
           <div className="flex justify-between text-xs text-muted-foreground mb-2">
-            <span>Empty</span>
-            <span>Full</span>
+            <span>{t('mindScanner.empty')}</span>
+            <span>{t('mindScanner.full')}</span>
           </div>
           <Slider
             value={energyLevel}
@@ -149,7 +156,7 @@ export function MindScanner({ onBack }: MindScannerProps) {
         ) : (
           <Sparkles className="mr-2" size={20} />
         )}
-        Get AI Suggestion
+        {t('mindScanner.getAiSuggestion')}
       </Button>
 
       {/* AI Suggestion Result */}
@@ -175,10 +182,10 @@ export function MindScanner({ onBack }: MindScannerProps) {
 
       {/* Recommendations */}
       <h3 className="text-lg font-semibold mb-3 text-foreground">
-        Quick Recommendations
+        {t('mindScanner.quickRecommendations')}
       </h3>
       <div className="space-y-3">
-        {getRecommendations().map((rec, index) => (
+        {getRecommendations(t).map((rec, index) => (
           <motion.div
             key={rec.title}
             initial={{ opacity: 0, x: -20 }}
