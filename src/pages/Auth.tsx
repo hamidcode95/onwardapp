@@ -204,10 +204,10 @@ const Auth = () => {
         >
           <span className="text-xs text-muted-foreground uppercase tracking-widest">{t('auth.poweredBy')}</span>
           <div className="flex items-center gap-4">
-            {/* Lovable Icon */}
+            {/* Claude Icon */}
             <div className="flex items-center gap-1.5 glass-card rounded-lg px-3 py-1.5">
-              <Sparkles size={16} className="text-primary" />
-              <span className="text-sm font-semibold text-foreground">Lovable</span>
+              <Sparkles size={16} style={{ color: '#D97757' }} />
+              <span className="text-sm font-semibold text-foreground">Claude</span>
             </div>
             <span className="text-muted-foreground text-xs">&</span>
             {/* DeepSeek Icon */}
