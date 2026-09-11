@@ -118,6 +118,20 @@
       "brainDumpEntry": "Brain dump entry (coming soon)"
     }
   },
+  "auth": {
+    "tagline": "Your ADHD Focus Companion",
+    "builtDifferent": "Built Different",
+    "adhdStatement": "Designed & envisioned by someone with <1>ADHD</1> — for people with ADHD. Every feature exists because <2>we actually need it</2>.",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "poweredBy": "Powered by",
+    "signInFailed": "Sign in failed",
+    "somethingWrong": "Something went wrong"
+  },
+  "notFound": {
+    "message": "Oops! Page not found",
+    "returnHome": "Return to Home"
+  },
   "timeAnchor": {
     "title": "Time Anchor",
     "subtitle": "Set a quick nudge for anything time-sensitive",

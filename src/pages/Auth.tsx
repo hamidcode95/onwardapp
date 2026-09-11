@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation, Trans } from 'react-i18next';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -20,13 +22,13 @@ const Auth = () => {
         },
       });
       if (error) {
-        toast({ title: 'Sign in failed', description: error.message, variant: 'destructive' });
+        toast({ title: t('auth.signInFailed'), description: error.message, variant: 'destructive' });
         setLoading(null);
       }
       // On success, Supabase redirects the browser to the provider's
       // consent screen, so there's nothing else to do here.
     } catch {
-      toast({ title: 'Something went wrong', variant: 'destructive' });
+      toast({ title: t('auth.somethingWrong'), variant: 'destructive' });
       setLoading(null);
     }
   };
@@ -56,7 +58,7 @@ const Auth = () => {
           <h1 className="text-3xl font-bold text-foreground neon-text tracking-tight">
             Onward
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">Your ADHD Focus Companion</p>
+          <p className="text-muted-foreground mt-1 text-sm">{t('auth.tagline')}</p>
         </motion.div>
 
         {/* ADHD Creator Badge */}
@@ -69,13 +71,18 @@ const Auth = () => {
           <div className="flex items-center justify-center gap-2 mb-2">
             <Heart size={16} className="text-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-              Built Different
+              {t('auth.builtDifferent')}
             </span>
             <Heart size={16} className="text-primary" />
           </div>
           <p className="text-sm text-foreground/90 leading-relaxed">
-            Designed & envisioned by someone with <span className="text-primary font-semibold">ADHD</span> — 
-            for people with ADHD. Every feature exists because <em>we actually need it</em>.
+            <Trans
+              i18nKey="auth.adhdStatement"
+              components={{
+                1: <span className="text-primary font-semibold" />,
+                2: <em />,
+              }}
+            />
           </p>
         </motion.div>
 
@@ -101,7 +108,7 @@ const Auth = () => {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
             )}
-            Continue with Google
+            {t('auth.continueWithGoogle')}
           </Button>
 
           <Button
@@ -116,7 +123,7 @@ const Auth = () => {
                 <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
             )}
-            Continue with Apple
+            {t('auth.continueWithApple')}
           </Button>
         </motion.div>
 
@@ -127,7 +134,7 @@ const Auth = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
         >
-          <span className="text-xs text-muted-foreground uppercase tracking-widest">Powered by</span>
+          <span className="text-xs text-muted-foreground uppercase tracking-widest">{t('auth.poweredBy')}</span>
           <div className="flex items-center gap-4">
             {/* Lovable Icon */}
             <div className="flex items-center gap-1.5 glass-card rounded-lg px-3 py-1.5">

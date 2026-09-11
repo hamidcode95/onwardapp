@@ -118,6 +118,20 @@
       "brainDumpEntry": "یه ثبت تخلیه‌ی ذهن (به‌زودی)"
     }
   },
+  "auth": {
+    "tagline": "همراه تمرکز ADHD تو",
+    "builtDifferent": "یه جور دیگه ساخته شده",
+    "adhdStatement": "طراحی و تصور شده توسط یه نفر با <1>ADHD</1> — برای آدم‌های ADHD. هر ویژگی وجود داره چون <2>واقعاً بهش نیاز داریم</2>.",
+    "continueWithGoogle": "ادامه با گوگل",
+    "continueWithApple": "ادامه با اپل",
+    "poweredBy": "قدرت‌گرفته از",
+    "signInFailed": "ورود ناموفق بود",
+    "somethingWrong": "یه مشکلی پیش اومد"
+  },
+  "notFound": {
+    "message": "اوپس! صفحه پیدا نشد",
+    "returnHome": "بازگشت به خانه"
+  },
   "timeAnchor": {
     "title": "لنگر زمانی",
     "subtitle": "برای هر کار زمان‌داری یه یادآوری سریع بذار",
