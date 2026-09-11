@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Heart } from 'lucide-react';
+import { Sparkles, Heart, Loader2 } from 'lucide-react';
 import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +11,9 @@ import { useTranslation, Trans } from 'react-i18next';
 const Auth = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<string | null>(null);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { toast } = useToast();
 
   const handleSignIn = async (provider: 'google') => {
@@ -29,6 +33,35 @@ const Auth = () => {
       // consent screen, so there's nothing else to do here.
     } catch {
       toast({ title: t('auth.somethingWrong'), variant: 'destructive' });
+      setLoading(null);
+    }
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password) return;
+    setLoading('email');
+    try {
+      if (mode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          toast({ title: t('auth.signUpFailed'), description: error.message, variant: 'destructive' });
+        } else if (!data.session) {
+          // Email confirmation is required before the account is usable.
+          toast({ title: t('auth.checkEmailTitle'), description: t('auth.checkEmailBody') });
+        }
+        // If a session came back immediately (confirmation disabled),
+        // the auth-state listener in useAuth picks it up and the app
+        // navigates on its own — nothing else to do here.
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast({ title: t('auth.signInFailed'), description: error.message, variant: 'destructive' });
+        }
+      }
+    } catch {
+      toast({ title: t('auth.somethingWrong'), variant: 'destructive' });
+    } finally {
       setLoading(null);
     }
   };
@@ -110,6 +143,56 @@ const Auth = () => {
             )}
             {t('auth.continueWithGoogle')}
           </Button>
+
+          <div className="flex items-center gap-3 py-1">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground uppercase tracking-widest">{t('auth.or')}</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <form onSubmit={handleEmailAuth} className="flex flex-col gap-3">
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('auth.email')}
+              autoComplete="email"
+              required
+              className="h-12 rounded-xl"
+            />
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('auth.password')}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+              required
+              minLength={6}
+              className="h-12 rounded-xl"
+            />
+            <Button
+              type="submit"
+              disabled={loading !== null}
+              variant="secondary"
+              className="w-full h-12 text-base font-medium rounded-xl"
+            >
+              {loading === 'email' ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : mode === 'signup' ? (
+                t('auth.signUp')
+              ) : (
+                t('auth.signIn')
+              )}
+            </Button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors text-center"
+          >
+            {mode === 'signin' ? t('auth.noAccount') : t('auth.haveAccount')}
+          </button>
         </motion.div>
 
         {/* Powered By Section */}
@@ -127,13 +210,13 @@ const Auth = () => {
               <span className="text-sm font-semibold text-foreground">Lovable</span>
             </div>
             <span className="text-muted-foreground text-xs">&</span>
-            {/* Gemini Icon */}
+            {/* DeepSeek Icon */}
             <div className="flex items-center gap-1.5 glass-card rounded-lg px-3 py-1.5">
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
                 <path d="M12 2C12 2 14.5 6.5 18 8C14.5 9.5 12 14 12 14C12 14 9.5 9.5 6 8C9.5 6.5 12 2 12 2Z" fill="hsl(150, 47%, 71%)" />
                 <path d="M12 14C12 14 13.5 17 16 18C13.5 19 12 22 12 22C12 22 10.5 19 8 18C10.5 17 12 14 12 14Z" fill="hsl(150, 47%, 71%)" opacity="0.6" />
               </svg>
-              <span className="text-sm font-semibold text-foreground">Gemini</span>
+              <span className="text-sm font-semibold text-foreground">DeepSeek</span>
             </div>
           </div>
         </motion.div>

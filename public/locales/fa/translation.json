@@ -126,7 +126,17 @@
     "continueWithApple": "ادامه با اپل",
     "poweredBy": "قدرت‌گرفته از",
     "signInFailed": "ورود ناموفق بود",
-    "somethingWrong": "یه مشکلی پیش اومد"
+    "signUpFailed": "ثبت‌نام ناموفق بود",
+    "somethingWrong": "یه مشکلی پیش اومد",
+    "or": "یا",
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "signIn": "ورود",
+    "signUp": "ثبت‌نام",
+    "noAccount": "حساب نداری؟ ثبت‌نام کن",
+    "haveAccount": "قبلاً ثبت‌نام کردی؟ وارد شو",
+    "checkEmailTitle": "ایمیلت رو چک کن",
+    "checkEmailBody": "یه لینک تأیید برات فرستادیم تا ساخت حسابت تکمیل بشه."
   },
   "notFound": {
     "message": "اوپس! صفحه پیدا نشد",

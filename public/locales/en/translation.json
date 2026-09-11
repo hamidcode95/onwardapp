@@ -126,7 +126,17 @@
     "continueWithApple": "Continue with Apple",
     "poweredBy": "Powered by",
     "signInFailed": "Sign in failed",
-    "somethingWrong": "Something went wrong"
+    "signUpFailed": "Sign up failed",
+    "somethingWrong": "Something went wrong",
+    "or": "or",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "noAccount": "Don't have an account? Sign up",
+    "haveAccount": "Already have an account? Sign in",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent you a confirmation link to finish creating your account."
   },
   "notFound": {
     "message": "Oops! Page not found",
