@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface ModuleHeaderProps {
   title: string;
@@ -8,6 +9,7 @@ interface ModuleHeaderProps {
 }
 
 export function ModuleHeader({ title, description, onBack }: ModuleHeaderProps) {
+  const { t } = useTranslation();
   return (
     <motion.div
       className="mb-6"
@@ -19,8 +21,8 @@ export function ModuleHeader({ title, description, onBack }: ModuleHeaderProps) 
         onClick={onBack}
         className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-4"
       >
-        <ArrowLeft size={20} />
-        <span>Back</span>
+        <ArrowLeft size={20} className="rtl:rotate-180" />
+        <span>{t('common.back')}</span>
       </button>
       <h1 className="text-2xl font-bold text-foreground neon-text">{title}</h1>
       {description && (
