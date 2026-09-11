@@ -1,31 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
-// Oly motivational messages
-const MOTIVATION_MESSAGES = [
-  { title: '🌟 Oly میگه:', body: 'داری عالی پیش میری! ادامه بده!' },
-  { title: '💪 آفرین!', body: 'هر قدم کوچیک مهمه. تو فوق‌العاده‌ای!' },
-  { title: '🧠 یادآوری Oly:', body: 'نفس عمیق بکش. تمرکز تو عالیه!' },
-  { title: '🎯 فوکوس!', body: 'به هدفت نزدیک‌تر شدی!' },
-  { title: '⭐ Oly بهت افتخار میکنه!', body: 'تو یکی از بهترین‌هایی!' },
-  { title: '🚀 ادامه بده!', body: 'مسیرت درسته، فقط ادامه بده!' },
-  { title: '🌿 استراحت یادت نره!', body: 'یه وقفه کوتاه ذهنت رو تازه میکنه.' },
-  { title: '✨ لحظه درخشش!', body: 'الان بهترین زمان برای شروعه!' },
-];
+interface MessagePair { title: string; body: string }
 
-const FOCUS_REMINDERS = [
-  { title: '⏰ وقت فوکوسه!', body: 'بیا یه جلسه تمرکز شروع کنیم.' },
-  { title: '🎯 چالش فوکوس!', body: '15 دقیقه تمرکز = 1 برد بزرگ!' },
-  { title: '🧘 آماده‌ای؟', body: 'Oly منتظرته برای یه Sprint فوکوس!' },
-];
-
-const TASK_COMPLETE_MESSAGES = [
-  { title: '🎉 تسک تکمیل شد!', body: 'عالی بود! یه قدم دیگه جلو رفتی!' },
-  { title: '✅ خوردیش!', body: 'این تسک رو له کردی! بعدی چیه؟' },
-  { title: '🏆 برد!', body: 'Oly خوشحاله! ادامه بده!' },
-];
-
-function getRandomMessage(messages: { title: string; body: string }[]) {
+function getRandomMessage(messages: MessagePair[]) {
   return messages[Math.floor(Math.random() * messages.length)];
 }
 
@@ -60,6 +39,7 @@ export function saveNotificationSettings(settings: NotificationSettings) {
 import { notifications } from '@/lib/notifications';
 
 export function useNotifications() {
+  const { t } = useTranslation();
   const focusReminderRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const motivationRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -85,14 +65,17 @@ export function useNotifications() {
   }, [sendToast, sendPushNotification]);
 
   const notifyTaskComplete = useCallback(() => {
-    const msg = getRandomMessage(TASK_COMPLETE_MESSAGES);
+    const messages = t('toasts.taskComplete', { returnObjects: true }) as MessagePair[];
+    const msg = getRandomMessage(messages);
     notify(msg.title, msg.body, 'success');
-  }, [notify]);
+  }, [notify, t]);
 
   const notifyFocusComplete = useCallback((minutes: number) => {
-    notify('🎉 جلسه فوکوس تمام شد!', `${minutes} دقیقه تمرکز کردی! آفرین!`, 'success');
-    sendPushNotification('🎉 جلسه فوکوس تمام شد!', `${minutes} دقیقه تمرکز کردی! آفرین!`);
-  }, [notify, sendPushNotification]);
+    const title = t('toasts.focusSessionCompleteTitle');
+    const body = t('toasts.focusSessionCompleteBody', { minutes });
+    notify(title, body, 'success');
+    sendPushNotification(title, body);
+  }, [notify, sendPushNotification, t]);
 
   const stopAllReminders = useCallback(() => {
     if (focusReminderRef.current) { clearInterval(focusReminderRef.current); focusReminderRef.current = null; }
@@ -105,10 +88,11 @@ export function useNotifications() {
     if (!settings.motivationEnabled) { motivationRef.current = null; return; }
     const mins = intervalMin ?? settings.motivationIntervalMin;
     motivationRef.current = setInterval(() => {
-      const msg = getRandomMessage(MOTIVATION_MESSAGES);
+      const messages = t('toasts.motivational', { returnObjects: true }) as MessagePair[];
+      const msg = getRandomMessage(messages);
       notify(msg.title, msg.body);
     }, mins * 60 * 1000);
-  }, [notify]);
+  }, [notify, t]);
 
   const startFocusReminders = useCallback((intervalMin?: number) => {
     if (focusReminderRef.current) clearInterval(focusReminderRef.current);
@@ -116,10 +100,11 @@ export function useNotifications() {
     if (!settings.focusRemindersEnabled) { focusReminderRef.current = null; return; }
     const mins = intervalMin ?? settings.focusReminderIntervalMin;
     focusReminderRef.current = setInterval(() => {
-      const msg = getRandomMessage(FOCUS_REMINDERS);
+      const messages = t('toasts.focusReminders', { returnObjects: true }) as MessagePair[];
+      const msg = getRandomMessage(messages);
       notify(msg.title, msg.body, 'warning');
     }, mins * 60 * 1000);
-  }, [notify]);
+  }, [notify, t]);
 
   const applySettings = useCallback((settings: NotificationSettings) => {
     saveNotificationSettings(settings);

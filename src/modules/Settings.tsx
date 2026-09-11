@@ -20,12 +20,12 @@ interface SettingsProps {
   onUpdateOlySize: (size: number) => void;
 }
 
-const AMBIENT_SOUNDS = [
-  { id: 'none', name: 'Off', emoji: '🔇' },
-  { id: 'rain', name: 'Rain', emoji: '🌧️' },
-  { id: 'forest', name: 'Forest', emoji: '🌲' },
-  { id: 'cafe', name: 'Café', emoji: '☕' },
-  { id: 'waves', name: 'Waves', emoji: '🌊' },
+const AMBIENT_SOUND_KEYS = [
+  { id: 'none', key: 'off', emoji: '🔇' },
+  { id: 'rain', key: 'rain', emoji: '🌧️' },
+  { id: 'forest', key: 'forest', emoji: '🌲' },
+  { id: 'cafe', key: 'cafe', emoji: '☕' },
+  { id: 'waves', key: 'waves', emoji: '🌊' },
 ];
 
 export function Settings({ 
@@ -42,6 +42,11 @@ export function Settings({
   const { signOut } = useAuth();
   const { applySettings, sendToast } = useNotifications();
   const { t, i18n } = useTranslation();
+  const AMBIENT_SOUNDS = AMBIENT_SOUND_KEYS.map(({ id, key, emoji }) => ({
+    id,
+    emoji,
+    name: t(`settings.sounds.${key}`),
+  }));
 
   const handleNameSave = () => {
     onUpdateName(localName);
@@ -56,7 +61,7 @@ export function Settings({
     <div className="min-h-screen p-4">
       <ModuleHeader
         title={t('settings.title')}
-        description="Customize your experience"
+        description={t('settings.description')}
         onBack={onBack}
       />
 
@@ -70,17 +75,17 @@ export function Settings({
           <div className="p-2 rounded-lg bg-primary/20">
             <User size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold">Profile</h3>
+          <h3 className="font-semibold">{t('settings.profile')}</h3>
         </div>
         <div className="flex gap-2">
           <Input
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
-            placeholder="Your name"
+            placeholder={t('settings.namePlaceholder')}
             className="bg-background/50 border-border"
           />
           <Button onClick={handleNameSave} variant="outline">
-            Save
+            {t('settings.save')}
           </Button>
         </div>
       </GlassCard>
@@ -117,13 +122,13 @@ export function Settings({
           <div className="p-2 rounded-lg bg-primary/20">
             <Maximize size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold">Oly Size</h3>
+          <h3 className="font-semibold">{t('settings.olySize')}</h3>
         </div>
         <div className="px-2">
           <div className="flex justify-between text-xs text-muted-foreground mb-2">
-            <span>Small</span>
+            <span>{t('settings.small')}</span>
             <span>{localOlySize[0]}px</span>
-            <span>Large</span>
+            <span>{t('settings.large')}</span>
           </div>
           <Slider
             value={localOlySize}
@@ -142,14 +147,14 @@ export function Settings({
           <div className="p-2 rounded-lg bg-primary/20">
             <Bell size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold">Notifications</h3>
+          <h3 className="font-semibold">{t('settings.notifications')}</h3>
         </div>
 
         {/* Motivation toggle */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-sm font-medium text-foreground">پیام‌های انگیزشی</p>
-            <p className="text-xs text-muted-foreground">پیام‌های Oly برای انگیزه دادن</p>
+            <p className="text-sm font-medium text-foreground">{t('settings.motivationalMessages')}</p>
+            <p className="text-xs text-muted-foreground">{t('settings.motivationalMessagesDesc')}</p>
           </div>
           <Switch
             checked={notifSettings.motivationEnabled}
@@ -163,7 +168,7 @@ export function Settings({
         {notifSettings.motivationEnabled && (
           <div className="mb-4 px-1">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>هر {notifSettings.motivationIntervalMin} دقیقه</span>
+              <span>{t('settings.everyMinutes', { minutes: notifSettings.motivationIntervalMin })}</span>
             </div>
             <Slider
               value={[notifSettings.motivationIntervalMin]}
@@ -182,8 +187,8 @@ export function Settings({
         {/* Focus reminders toggle */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-sm font-medium text-foreground">یادآوری فوکوس</p>
-            <p className="text-xs text-muted-foreground">یادآوری برای شروع جلسه تمرکز</p>
+            <p className="text-sm font-medium text-foreground">{t('settings.focusReminders')}</p>
+            <p className="text-xs text-muted-foreground">{t('settings.focusRemindersDesc')}</p>
           </div>
           <Switch
             checked={notifSettings.focusRemindersEnabled}
@@ -197,7 +202,7 @@ export function Settings({
         {notifSettings.focusRemindersEnabled && (
           <div className="px-1">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>هر {notifSettings.focusReminderIntervalMin} دقیقه</span>
+              <span>{t('settings.everyMinutes', { minutes: notifSettings.focusReminderIntervalMin })}</span>
             </div>
             <Slider
               value={[notifSettings.focusReminderIntervalMin]}
@@ -220,7 +225,7 @@ export function Settings({
           <div className="p-2 rounded-lg bg-primary/20">
             <Volume2 size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold">Ambient Sounds</h3>
+          <h3 className="font-semibold">{t('settings.ambientSounds')}</h3>
         </div>
         <div className="grid grid-cols-5 gap-2">
           {AMBIENT_SOUNDS.map((sound) => (
@@ -240,7 +245,7 @@ export function Settings({
           ))}
         </div>
         <p className="text-xs text-muted-foreground mt-3 text-center">
-          🔊 Sound playback coming soon
+          {t('settings.soundComingSoon')}
         </p>
       </GlassCard>
 
@@ -250,7 +255,7 @@ export function Settings({
           <div className="p-2 rounded-lg bg-primary/20">
             <Palette size={20} className="text-primary" />
           </div>
-          <h3 className="font-semibold">Theme</h3>
+          <h3 className="font-semibold">{t('settings.theme')}</h3>
         </div>
         <div className="flex gap-3">
           <div className="w-8 h-8 rounded-full bg-[#95D5B2] border-2 border-primary neon-glow" />
@@ -259,7 +264,7 @@ export function Settings({
           <div className="w-8 h-8 rounded-full bg-[#EC4899] border-2 border-border opacity-50" />
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          🎨 More themes coming soon
+          {t('settings.themeComingSoon')}
         </p>
       </GlassCard>
 
@@ -271,7 +276,7 @@ export function Settings({
           className="w-full gap-2 border-destructive/30 text-destructive hover:bg-destructive/10"
         >
           <LogOut size={18} />
-          Sign Out
+          {t('settings.signOut')}
         </Button>
       </div>
     </div>

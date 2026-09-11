@@ -175,7 +175,7 @@ const Index = () => {
 
   const handleFeatherEarn = (amount: number) => {
     addFeathers(amount);
-    sendToast('🪶 Feathers Earned!', `+${amount} feathers added to your collection!`);
+    sendToast(t('toasts.feathersEarnedTitle'), t('toasts.feathersEarnedBody', { amount }));
   };
 
   const renderModule = () => {
@@ -290,13 +290,7 @@ const Index = () => {
               state="neutral"
               size={state.olySize}
               onClick={() => {
-                const msgs = [
-                  'سلام! امروز چه کاری انجام میدیم؟ 🎯',
-                  'آماده‌ای برای یه روز عالی؟ 💪',
-                  'هی! بزن بریم یه تسک بزنیم! ✨',
-                  'من اینجام، هر وقت آماده بودی! 🌟',
-                  'یه نفس عمیق بکش... حالا بزن بریم! 🧘',
-                ];
+                const msgs = t('toasts.olyGreetings', { returnObjects: true }) as string[];
                 sendToast('🫧 Oly', msgs[Math.floor(Math.random() * msgs.length)]);
               }}
             />

@@ -132,6 +132,39 @@
     "message": "Oops! Page not found",
     "returnHome": "Return to Home"
   },
+  "toasts": {
+    "feathersEarnedTitle": "🪶 Feathers Earned!",
+    "feathersEarnedBody": "+{{amount}} feathers added to your collection!",
+    "olyGreetings": [
+      "Hey! What are we tackling today? 🎯",
+      "Ready for a great day? 💪",
+      "Hey! Let's knock out a task! ✨",
+      "I'm here whenever you're ready! 🌟",
+      "Take a deep breath... now let's go! 🧘"
+    ],
+    "motivational": [
+      { "title": "🌟 Oly says:", "body": "You're doing great! Keep going!" },
+      { "title": "💪 Nice!", "body": "Every small step counts. You're amazing!" },
+      { "title": "🧠 Oly's reminder:", "body": "Take a deep breath. Your focus is great!" },
+      { "title": "🎯 Focus!", "body": "You're getting closer to your goal!" },
+      { "title": "⭐ Oly's proud of you!", "body": "You're one of the best!" },
+      { "title": "🚀 Keep going!", "body": "You're on the right path, just keep going!" },
+      { "title": "🌿 Don't forget to rest!", "body": "A short break refreshes your mind." },
+      { "title": "✨ Shine moment!", "body": "Now is the best time to start!" }
+    ],
+    "focusReminders": [
+      { "title": "⏰ Focus time!", "body": "Let's start a focus session." },
+      { "title": "🎯 Focus challenge!", "body": "15 minutes of focus = 1 big win!" },
+      { "title": "🧘 Ready?", "body": "Oly is waiting for a Focus Sprint!" }
+    ],
+    "taskComplete": [
+      { "title": "🎉 Task complete!", "body": "Awesome! One more step forward!" },
+      { "title": "✅ Crushed it!", "body": "You demolished that task! What's next?" },
+      { "title": "🏆 Win!", "body": "Oly is happy! Keep going!" }
+    ],
+    "focusSessionCompleteTitle": "🎉 Focus session complete!",
+    "focusSessionCompleteBody": "You focused for {{minutes}} minutes! Great job!"
+  },
   "timeAnchor": {
     "title": "Time Anchor",
     "subtitle": "Set a quick nudge for anything time-sensitive",
@@ -157,9 +190,34 @@
   },
   "settings": {
     "title": "Settings",
+    "description": "Customize your experience",
     "language": "Language",
     "english": "English",
-    "persian": "فارسی"
+    "persian": "فارسی",
+    "profile": "Profile",
+    "namePlaceholder": "Your name",
+    "save": "Save",
+    "olySize": "Oly Size",
+    "small": "Small",
+    "large": "Large",
+    "notifications": "Notifications",
+    "motivationalMessages": "Motivational Messages",
+    "motivationalMessagesDesc": "Oly's messages to keep you motivated",
+    "everyMinutes": "Every {{minutes}} min",
+    "focusReminders": "Focus Reminders",
+    "focusRemindersDesc": "Reminders to start a focus session",
+    "ambientSounds": "Ambient Sounds",
+    "sounds": {
+      "off": "Off",
+      "rain": "Rain",
+      "forest": "Forest",
+      "cafe": "Café",
+      "waves": "Waves"
+    },
+    "soundComingSoon": "🔊 Sound playback coming soon",
+    "theme": "Theme",
+    "themeComingSoon": "🎨 More themes coming soon",
+    "signOut": "Sign Out"
   },
   "installPrompt": {
     "title": "Install Onward",
