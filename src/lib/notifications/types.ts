@@ -20,8 +20,10 @@ export interface ScheduleNotificationOptions {
   /**
    * Arbitrary payload carried with the notification so the app can tell
    * what it was about when the user taps it later (e.g.
-   * `{ type: 'time-anchor', anchorId }`). Not yet wired to an interaction
-   * handler on native — see nativeAdapter.ts.
+   * `{ type: 'time-anchor', anchorId }`). Delivered back via
+   * `onNotificationTap` on native; Web Push instead uses a `?anchor=`
+   * URL query param (see Index.tsx) since Web Push always resumes the
+   * app via a real page load.
    */
   data?: Record<string, unknown>;
 }
@@ -63,6 +65,20 @@ export interface NotificationAdapter {
    * Native: cancels every pending local notification.
    */
   cancelAll(): Promise<void>;
+
+  /**
+   * Registers a callback invoked when the user taps a notification that
+   * carries a `data` payload (see `ScheduleNotificationOptions.data`).
+   * - Web: intentionally a no-op. Web Push notification taps arrive via a
+   *   real page load carrying `?anchor=<id>` (see Index.tsx), not a live
+   *   in-page event — there's nothing to subscribe to here.
+   * - Native: fires for every tapped Local Notification for as long as
+   *   the app process is alive, including when the tap itself launched
+   *   or resumed the app.
+   * Calling this more than once only replaces which callback receives
+   * future taps — it never attaches more than one underlying listener.
+   */
+  onNotificationTap(callback: (data: Record<string, unknown>) => void): void;
 
   /**
    * Opts this device in to receive alerts for `userId` even when the app

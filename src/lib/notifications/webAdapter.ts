@@ -38,6 +38,11 @@ export const webNotificationAdapter: NotificationAdapter = {
     // of its own to clear.
   },
 
+  onNotificationTap(_callback) {
+    // See onNotificationTap() doc in types.ts — web's tap interaction goes
+    // through the ?anchor= URL param on the resulting page load instead.
+  },
+
   async enableBackgroundAlerts(userId: string): Promise<BackgroundAlertsResult> {
     if (!isPushSupported()) return { ok: false, reason: 'unsupported' };
     const result = await subscribeToPush(userId);

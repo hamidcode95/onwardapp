@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Clock, Brain, Shuffle, Activity, Trophy, Settings as SettingsIcon, MessageCircle, Home as HomeIcon } from 'lucide-react';
 import { useAppState } from '@/hooks/useAppState';
@@ -109,10 +109,44 @@ const Index = () => {
     notifications.cancelScheduled(id);
   };
 
-  // Deep link from a tapped push notification (?anchor=<id>) — force the
-  // full-screen alarm experience immediately instead of waiting for the
-  // normal polling loop, and recover the anchor from Supabase if local
-  // state doesn't have it (e.g. after a refresh).
+  // Shared by both notification-tap paths below. Wrapped in a ref so the
+  // native listener (registered exactly once, on mount) always calls the
+  // latest version instead of a stale closure over old state.
+  const activateAnchorAlarm = useCallback(
+    (anchorId: string) => {
+      const existing = state.timeAnchors.find((a) => a.id === anchorId);
+      if (existing) {
+        if (!existing.fired) markTimeAnchorFired(anchorId);
+        return;
+      }
+
+      // Not in local state (different session/refresh) — pull it from the
+      // server mirror so the alarm still shows.
+      import('@/integrations/supabase/client').then(({ supabase }) => {
+        supabase
+          .from('time_anchors')
+          .select('id, label, target_time, dismissed')
+          .eq('id', anchorId)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data && !data.dismissed) {
+              const anchor = addTimeAnchor(data.label, data.target_time, data.id);
+              markTimeAnchorFired(anchor.id);
+            }
+          });
+      });
+    },
+    [state.timeAnchors, markTimeAnchorFired, addTimeAnchor],
+  );
+  const activateAnchorAlarmRef = useRef(activateAnchorAlarm);
+  useEffect(() => {
+    activateAnchorAlarmRef.current = activateAnchorAlarm;
+  }, [activateAnchorAlarm]);
+
+  // Web: deep link from a tapped Web Push notification (?anchor=<id>) —
+  // force the full-screen alarm experience immediately instead of waiting
+  // for the normal polling loop. Web Push always resumes the app via a
+  // real page load, which is why this reads the URL rather than an event.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const anchorId = params.get('anchor');
@@ -120,29 +154,21 @@ const Index = () => {
 
     // Clean the URL so a later refresh doesn't re-trigger this.
     window.history.replaceState({}, '', window.location.pathname);
+    activateAnchorAlarmRef.current(anchorId);
+  }, []);
 
-    const existing = state.timeAnchors.find((a) => a.id === anchorId);
-    if (existing) {
-      if (!existing.fired) markTimeAnchorFired(anchorId);
-      return;
-    }
-
-    // Not in local state (different session/refresh) — pull it from the
-    // server mirror so the alarm still shows.
-    import('@/integrations/supabase/client').then(({ supabase }) => {
-      supabase
-        .from('time_anchors')
-        .select('id, label, target_time, dismissed')
-        .eq('id', anchorId)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data && !data.dismissed) {
-            const anchor = addTimeAnchor(data.label, data.target_time, data.id);
-            markTimeAnchorFired(anchor.id);
-          }
-        });
+  // Native: a tapped Local Notification arrives as a live event, never a
+  // URL — see NotificationAdapter.onNotificationTap. Registered once; the
+  // native adapter itself guarantees only one underlying listener exists
+  // no matter how many times this fires.
+  useEffect(() => {
+    notifications.onNotificationTap((data) => {
+      if (data?.type !== 'time-anchor') return;
+      const anchorId = data.anchorId;
+      if (typeof anchorId === 'string' && anchorId.length > 0) {
+        activateAnchorAlarmRef.current(anchorId);
+      }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Request notification permission
