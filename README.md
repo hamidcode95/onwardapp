@@ -28,7 +28,7 @@
 | Animation | [Framer Motion](https://www.framer.com/motion/) |
 | Data / state | [TanStack Query](https://tanstack.com/query), React Hooks |
 | Auth & Backend | [Supabase](https://supabase.com/) (Auth, Database, Edge Functions) |
-| AI | Supabase Edge Function (`ai-assistant`) |
+| AI | Supabase Edge Function (`ai-assistant`) → [OpenRouter](https://openrouter.ai) (free tier) |
 | Charts | [Recharts](https://recharts.org/) |
 | PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) |
 | Deployment | [Vercel](https://vercel.com/) |
@@ -119,6 +119,68 @@ Create a `.env` file in the project root with your Supabase credentials:
 VITE_SUPABASE_URL=your-supabase-project-url
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
+
+The frontend never needs an AI provider key — see below.
+
+### 🤖 AI Provider
+
+AI features (Task Shredder, Mind Scanner, Decision Maker, Chat with Oly) are
+powered by a single Supabase Edge Function, `ai-assistant`, which is the only
+part of the codebase that talks to an AI provider:
+
+```
+React (useAI hook) → Supabase Edge Function (ai-assistant) → AI provider
+```
+
+The provider itself is swappable via **secrets only** — no code changes
+needed to switch providers or models. The Edge Function reads:
+
+| Secret | Purpose | Current value |
+|---|---|---|
+| `AI_PROVIDER` | Which provider branch to use | `openrouter` (optional — this is the default if unset) |
+| `AI_MODEL` | Model ID to request | `nvidia/nemotron-3-ultra-550b-a55b:free` (optional — this is the default if unset) |
+| `OPENROUTER_API_KEY` | Your OpenRouter API key | **required** |
+
+**Current provider:** [OpenRouter](https://openrouter.ai) — chosen because it
+offers genuinely free models with no credit card required, which direct
+provider APIs (Gemini, DeepSeek, OpenAI, Anthropic) generally do not from
+every region, and some are entirely inaccessible from certain countries due
+to export restrictions.
+
+**Current model:** `nvidia/nemotron-3-ultra-550b-a55b:free` — NVIDIA Nemotron
+3 Ultra, a free, open-weight, frontier-class reasoning model on OpenRouter's
+free tier (1M context, no cost). Always re-check
+[OpenRouter's free models list](https://openrouter.ai/models?fmt=free)
+before assuming this ID is still valid — free model availability rotates.
+
+**These keys are server-side only.** They live in Supabase Edge Function
+secrets and are never sent to, or readable by, the browser. Do **not** add
+`VITE_OPENROUTER_API_KEY` or any provider key to the frontend `.env`.
+
+#### Setting it up
+
+1. Create a free account at [openrouter.ai](https://openrouter.ai) and
+   generate an API key under **Keys**.
+2. In the Supabase Dashboard, go to **Edge Functions → ai-assistant →
+   Manage secrets** and add:
+   - `OPENROUTER_API_KEY` = the key from step 1
+   - (optional) `AI_MODEL` if you want to override the default above
+   - (optional) `AI_PROVIDER` — only needed once a second provider branch
+     exists in `callAI()`
+3. No redeploy is required after changing secrets — they're read at request
+   time via `Deno.env.get(...)`.
+
+#### Known limitations
+
+- Free OpenRouter models are rate-limited and intended for development/MVP/
+  early-user traffic, not guaranteed production-scale throughput.
+- Free model availability and exact IDs can change; if AI features start
+  failing, check the Edge Function logs first (Supabase Dashboard → Edge
+  Functions → ai-assistant → Logs) — the client only ever sees a generic
+  "AI Error" toast by design, so the real cause is always server-side.
+- To switch providers later (e.g. add a paid fallback), add a new `case` in
+  `callAI()` inside `supabase/functions/ai-assistant/index.ts` — the rest of
+  the function, and the entire frontend, needs no changes.
 
 ### Run locally
 
