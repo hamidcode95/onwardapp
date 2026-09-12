@@ -17,6 +17,13 @@ export interface ScheduleNotificationOptions {
   body: string;
   /** When it should fire. */
   at: Date;
+  /**
+   * Arbitrary payload carried with the notification so the app can tell
+   * what it was about when the user taps it later (e.g.
+   * `{ type: 'time-anchor', anchorId }`). Not yet wired to an interaction
+   * handler on native — see nativeAdapter.ts.
+   */
+  data?: Record<string, unknown>;
 }
 
 export type BackgroundAlertsResult =
@@ -47,6 +54,15 @@ export interface NotificationAdapter {
 
   /** Cancels a previously scheduled notification by id. */
   cancelScheduled(id: string): Promise<void>;
+
+  /**
+   * Cancels every notification this adapter currently has scheduled.
+   * Web: no-op — Web's real scheduling state lives server-side (the
+   * `time_anchors` table), so "cancel all" there is a data operation
+   * (delete/dismiss the rows), not a notification-layer one.
+   * Native: cancels every pending local notification.
+   */
+  cancelAll(): Promise<void>;
 
   /**
    * Opts this device in to receive alerts for `userId` even when the app

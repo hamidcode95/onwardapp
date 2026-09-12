@@ -33,6 +33,11 @@ export const webNotificationAdapter: NotificationAdapter = {
     // the Supabase row (see anchorSync.ts), not through this adapter.
   },
 
+  async cancelAll() {
+    // See cancelAll() doc in types.ts — web has no local scheduling state
+    // of its own to clear.
+  },
+
   async enableBackgroundAlerts(userId: string): Promise<BackgroundAlertsResult> {
     if (!isPushSupported()) return { ok: false, reason: 'unsupported' };
     const result = await subscribeToPush(userId);

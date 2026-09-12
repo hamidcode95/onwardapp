@@ -88,7 +88,13 @@ const Index = () => {
   const handleAddTimeAnchor = (label: string, targetTime: string) => {
     const anchor = addTimeAnchor(label, targetTime);
     if (user) syncAnchorCreate({ id: anchor.id, userId: user.id, label, targetTime });
-    notifications.scheduleAt({ id: anchor.id, title: '⏰ Time Anchor', body: label, at: new Date(targetTime) });
+    notifications.scheduleAt({
+      id: anchor.id,
+      title: '⏰ Time Anchor',
+      body: label,
+      at: new Date(targetTime),
+      data: { type: 'time-anchor', anchorId: anchor.id },
+    });
   };
 
   const handleRemoveTimeAnchor = (id: string) => {

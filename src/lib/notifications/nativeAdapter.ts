@@ -41,7 +41,7 @@ export const nativeNotificationAdapter: NotificationAdapter = {
     });
   },
 
-  async scheduleAt({ id, title, body, at }: ScheduleNotificationOptions) {
+  async scheduleAt({ id, title, body, at, data }: ScheduleNotificationOptions) {
     // A true OS-scheduled alarm-style notification — the Android system
     // itself wakes up and fires this at the given time, whether the app
     // is open, backgrounded, or fully killed. No server or cron needed.
@@ -53,6 +53,7 @@ export const nativeNotificationAdapter: NotificationAdapter = {
           body,
           schedule: { at, allowWhileIdle: true },
           channelId: 'time_anchor',
+          extra: data,
         },
       ],
     });
@@ -61,6 +62,14 @@ export const nativeNotificationAdapter: NotificationAdapter = {
   async cancelScheduled(id: string) {
     await LocalNotifications.cancel({
       notifications: [{ id: stableNumericId(id) }],
+    });
+  },
+
+  async cancelAll() {
+    const pending = await LocalNotifications.getPending();
+    if (pending.notifications.length === 0) return;
+    await LocalNotifications.cancel({
+      notifications: pending.notifications.map((n) => ({ id: n.id })),
     });
   },
 

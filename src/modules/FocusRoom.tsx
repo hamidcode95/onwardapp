@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
@@ -26,10 +26,55 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
     label: t(`focusRoom.${key}`),
     minutes,
   }));
+
   const [selectedTimer, setSelectedTimer] = useState<TimerOption | null>(null);
-  const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+
+  // Source of truth for "how much time is left" is always a wall-clock
+  // timestamp, never a decrementing counter. `endAt` is when the running
+  // session will finish; `remainingWhenPausedMs` is a frozen snapshot taken
+  // the moment the user pauses. Neither depends on the JS interval below
+  // having actually fired on schedule — a throttled/suspended tab (locked
+  // phone, backgrounded browser) just means `now` jumps forward by more
+  // than a second next time the interval (or a resume) ticks, and the
+  // remaining time recalculated from `endAt` is still correct.
+  const [endAt, setEndAt] = useState<number | null>(null);
+  const [remainingWhenPausedMs, setRemainingWhenPausedMs] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const completedFiredRef = useRef(false);
+
+  // Ticks only to refresh the displayed countdown — it never decides how
+  // much time has actually elapsed. That's always `endAt - Date.now()`.
+  useEffect(() => {
+    if (!isRunning) return;
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  // Force an immediate resync (rather than waiting up to 1s for the next
+  // tick) whenever the tab/app becomes visible again — this is what makes
+  // "resume after the timer already expired in the background" behave
+  // correctly instead of briefly showing stale time.
+  useEffect(() => {
+    const resync = () => {
+      if (document.visibilityState === 'visible') setNow(Date.now());
+    };
+    document.addEventListener('visibilitychange', resync);
+    window.addEventListener('focus', resync);
+    return () => {
+      document.removeEventListener('visibilitychange', resync);
+      window.removeEventListener('focus', resync);
+    };
+  }, []);
+
+  const timeLeftMs = (() => {
+    if (!selectedTimer) return 0;
+    if (isRunning && endAt !== null) return Math.max(0, endAt - now);
+    if (remainingWhenPausedMs !== null) return remainingWhenPausedMs;
+    return selectedTimer.minutes * 60 * 1000;
+  })();
+  const timeLeft = Math.ceil(timeLeftMs / 1000);
 
   const totalSeconds = selectedTimer ? selectedTimer.minutes * 60 : 0;
   const progress = totalSeconds > 0 ? ((totalSeconds - timeLeft) / totalSeconds) * 100 : 0;
@@ -46,47 +91,65 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const handleComplete = useCallback((minutes: number) => {
+    setIsRunning(false);
+    setIsComplete(true);
+    setEndAt(null);
+    // Completion always goes through the app's notification layer
+    // (see useNotifications -> src/lib/notifications) — FocusRoom itself
+    // never touches a platform notification API directly.
+    onComplete?.(minutes);
+  }, [onComplete]);
+
   const startTimer = (option: TimerOption) => {
     setSelectedTimer(option);
-    setTimeLeft(option.minutes * 60);
-    setIsRunning(true);
+    setRemainingWhenPausedMs(null);
     setIsComplete(false);
+    completedFiredRef.current = false;
+    setEndAt(Date.now() + option.minutes * 60 * 1000);
+    setIsRunning(true);
+    setNow(Date.now());
+  };
+
+  const pauseTimer = () => {
+    if (endAt === null) return;
+    setRemainingWhenPausedMs(Math.max(0, endAt - Date.now()));
+    setEndAt(null);
+    setIsRunning(false);
+  };
+
+  const resumeTimer = () => {
+    if (remainingWhenPausedMs === null) return;
+    setEndAt(Date.now() + remainingWhenPausedMs);
+    setRemainingWhenPausedMs(null);
+    setIsRunning(true);
+    setNow(Date.now());
   };
 
   const togglePause = () => {
-    setIsRunning(!isRunning);
+    if (isRunning) pauseTimer();
+    else resumeTimer();
   };
 
   const resetTimer = () => {
     setIsRunning(false);
     setIsComplete(false);
     setSelectedTimer(null);
-    setTimeLeft(0);
+    setEndAt(null);
+    setRemainingWhenPausedMs(null);
+    completedFiredRef.current = false;
   };
 
-  const handleComplete = useCallback(() => {
-    setIsRunning(false);
-    setIsComplete(true);
-    if (selectedTimer && onComplete) {
-      onComplete(selectedTimer.minutes);
-    }
-  }, [selectedTimer, onComplete]);
-
+  // The only place completion is decided: `now` caught up to `endAt`.
+  // Guarded by a ref (not just `isComplete` state) so a rapid double-tick
+  // right at the boundary can never fire the completion callback twice.
   useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleComplete();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, timeLeft, handleComplete]);
+    if (!isRunning || endAt === null || isComplete) return;
+    if (now >= endAt && !completedFiredRef.current && selectedTimer) {
+      completedFiredRef.current = true;
+      handleComplete(selectedTimer.minutes);
+    }
+  }, [now, isRunning, endAt, isComplete, selectedTimer, handleComplete]);
 
   return (
     <div className="min-h-screen p-4">
