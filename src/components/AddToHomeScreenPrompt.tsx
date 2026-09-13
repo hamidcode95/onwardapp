@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Capacitor } from '@capacitor/core';
 import { X, Share, PlusSquare, Download, Sparkles } from 'lucide-react';
 import onwardLogo from '@/assets/onward-logo.png';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,9 @@ export function AddToHomeScreenPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    // Already a real installed app inside the Capacitor/Android shell —
+    // "add this to your home screen" doesn't apply there at all.
+    if (Capacitor.isNativePlatform()) return;
     if (isInStandaloneMode()) return;
 
     const dismissedAt = localStorage.getItem(DISMISS_KEY);
