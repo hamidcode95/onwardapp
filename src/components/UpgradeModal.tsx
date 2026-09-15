@@ -11,9 +11,11 @@ import { useCryptoPayment, type PlanId } from '@/hooks/useCryptoPayment';
 // side changes (wallet, amounts, network), update both.
 const RECEIVING_WALLET = '0xe0A40666797F83fACfEfB8be0401a76323bF3a56';
 const PLAN_AMOUNTS: Record<PlanId, string> = {
-  monthly: '4.99',
-  lifetime: '49.00',
+  monthly: '7.99',
+  yearly: '79.99',
+  lifetime: '399.99',
 };
+const PLAN_ORDER: PlanId[] = ['monthly', 'yearly', 'lifetime'];
 
 interface UpgradeModalProps {
   open: boolean;
@@ -24,7 +26,7 @@ interface UpgradeModalProps {
 export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
   const { t } = useTranslation();
   const { verify, isVerifying } = useCryptoPayment();
-  const [selectedPlan, setSelectedPlan] = useState<PlanId>('lifetime');
+  const [selectedPlan, setSelectedPlan] = useState<PlanId>('yearly');
   const [showCryptoFlow, setShowCryptoFlow] = useState(false);
   const [txHash, setTxHash] = useState('');
   const [walletCopied, setWalletCopied] = useState(false);
@@ -111,31 +113,43 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
                 </div>
 
                 <div className="mb-4 space-y-3">
-                  {(['monthly', 'lifetime'] as PlanId[]).map((plan) => (
-                    <GlassCard
-                      key={plan}
-                      hover={false}
-                      onClick={() => setSelectedPlan(plan)}
-                      className={`cursor-pointer transition-colors ${
-                        selectedPlan === plan ? 'border-primary/60' : ''
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-foreground">{t(`upgrade.plans.${plan}.name`)}</span>
-                            {plan === 'lifetime' && (
-                              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                                {t('upgrade.plans.lifetime.badge')}
-                              </span>
-                            )}
+                  {PLAN_ORDER.map((plan) => {
+                    const isSelected = selectedPlan === plan;
+                    return (
+                      <GlassCard
+                        key={plan}
+                        hover={false}
+                        onClick={() => setSelectedPlan(plan)}
+                        className={`cursor-pointer border-2 transition-all duration-150 ${
+                          isSelected
+                            ? 'border-primary bg-primary/10 shadow-[0_0_16px_hsla(150,47%,71%,0.35)]'
+                            : 'border-transparent hover:border-primary/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                              isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                            }`}
+                          >
+                            {isSelected && <Check size={13} className="text-background" strokeWidth={3} />}
                           </div>
-                          <p className="text-xs text-muted-foreground">{t(`upgrade.plans.${plan}.tagline`)}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-foreground">{t(`upgrade.plans.${plan}.name`)}</span>
+                              {(plan === 'yearly' || plan === 'lifetime') && (
+                                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                  {t(`upgrade.plans.${plan}.badge`)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">{t(`upgrade.plans.${plan}.tagline`)}</p>
+                          </div>
+                          <span className="shrink-0 font-bold text-primary">{t(`upgrade.plans.${plan}.price`)}</span>
                         </div>
-                        <span className="shrink-0 font-bold text-primary">{t(`upgrade.plans.${plan}.price`)}</span>
-                      </div>
-                    </GlassCard>
-                  ))}
+                      </GlassCard>
+                    );
+                  })}
                 </div>
 
                 <Button className="w-full neon-glow" onClick={() => setShowCryptoFlow(true)}>

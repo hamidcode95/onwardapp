@@ -120,29 +120,36 @@ export function Settings({
         </div>
       </GlassCard>
 
-      {/* Premium */}
-      <GlassCard className="mb-4" hover={false}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/20">
-              <Crown size={20} className="text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold">{t('settings.premium.title')}</h3>
-              {isPremium && subscription && (
-                <p className="text-xs text-muted-foreground">
-                  {t('settings.premium.active')} · {t(`settings.premium.activePlan.${subscription.plan}`)}
-                </p>
-              )}
-            </div>
+      {/* Premium — deliberately styled apart from the other settings
+          cards (gradient + glow border) so it reads as a distinct,
+          higher-stakes call to action rather than blending in. */}
+      <div className="mb-4 rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-5 shadow-[0_0_24px_hsla(150,47%,71%,0.25)]">
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/25">
+            <Crown size={28} className="text-primary" />
           </div>
-          {!isPremium && (
-            <Button size="sm" className="neon-glow shrink-0" onClick={() => setShowUpgradeModal(true)}>
-              {t('settings.premium.goPremium')}
-            </Button>
-          )}
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-bold text-foreground">{t('settings.premium.title')}</h3>
+            {isPremium && subscription ? (
+              <p className="text-sm text-primary">
+                {t('settings.premium.active')} · {t(`settings.premium.activePlan.${subscription.plan}`)}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t('settings.premium.teaser')}</p>
+            )}
+          </div>
         </div>
-      </GlassCard>
+        {!isPremium && (
+          <Button
+            size="lg"
+            className="mt-4 w-full neon-glow text-base font-semibold"
+            onClick={() => setShowUpgradeModal(true)}
+          >
+            <Crown size={18} className="mr-2" />
+            {t('settings.premium.goPremium')}
+          </Button>
+        )}
+      </div>
 
       <UpgradeModal
         open={showUpgradeModal}

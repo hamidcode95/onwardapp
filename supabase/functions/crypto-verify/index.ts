@@ -20,8 +20,9 @@ const TRANSFER_EVENT_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a116
 const RECEIVING_WALLET = "0xe0A40666797F83fACfEfB8be0401a76323bF3a56".toLowerCase();
 
 const PLAN_PRICES_USDT: Record<string, bigint> = {
-  monthly: 499n * 10n ** 16n, // 4.99 USDT, in 18-decimal base units
-  lifetime: 49n * 10n ** 18n, // 49 USDT
+  monthly: 7990000000000000000n, // 7.99 USDT, in 18-decimal base units
+  yearly: 79990000000000000000n, // 79.99 USDT
+  lifetime: 399990000000000000000n, // 399.99 USDT
 };
 
 // Public BSC RPC endpoints — tried in order, so one being rate-limited or
@@ -152,7 +153,7 @@ Deno.serve(async (req) => {
     if (!txHash || !/^0x[0-9a-f]{64}$/.test(txHash)) {
       return jsonResponse({ error: "That doesn't look like a valid transaction hash." }, 400);
     }
-    if (plan !== "monthly" && plan !== "lifetime") {
+    if (plan !== "monthly" && plan !== "yearly" && plan !== "lifetime") {
       return jsonResponse({ error: "Invalid plan" }, 400);
     }
 
@@ -230,7 +231,11 @@ Deno.serve(async (req) => {
     }
 
     const currentPeriodEnd =
-      plan === "monthly" ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null;
+      plan === "monthly"
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : plan === "yearly"
+        ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+        : null; // lifetime
 
     const { error: subError } = await supabase.from("subscriptions").upsert({
       user_id: userId,

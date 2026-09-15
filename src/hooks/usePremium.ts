@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface SubscriptionInfo {
-  plan: 'monthly' | 'lifetime';
+  plan: 'monthly' | 'yearly' | 'lifetime';
   status: 'active' | 'expired';
   currentPeriodEnd: string | null;
 }
@@ -29,7 +29,7 @@ export function usePremium() {
     setSubscription(
       data
         ? {
-            plan: data.plan as 'monthly' | 'lifetime',
+            plan: data.plan as 'monthly' | 'yearly' | 'lifetime',
             status: data.status as 'active' | 'expired',
             currentPeriodEnd: data.current_period_end,
           }

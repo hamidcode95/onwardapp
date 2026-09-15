@@ -146,8 +146,9 @@
     "title": "Oly Needs a Little Fuel!",
     "subtitle": "We've had an amazing 14 days together. To keep the Sanctuary growing and Oly's brain sharp, consider upgrading to Pro. You're not just buying an app; you're investing in your focus.",
     "plans": {
-      "monthly": { "name": "Monthly Buddy", "tagline": "Perfect for a quick boost.", "price": "$4.99/mo" },
-      "lifetime": { "name": "Lifetime Partner", "tagline": "One payment, Oly's home forever. No more bills.", "price": "$49.00", "badge": "Best Value" }
+      "monthly": { "name": "Monthly Buddy", "tagline": "Perfect for a quick boost.", "price": "$7.99/mo" },
+      "yearly": { "name": "Yearly Companion", "tagline": "The best of both worlds — save big, stay flexible.", "price": "$79.99/yr", "badge": "Save 17%" },
+      "lifetime": { "name": "Lifetime Partner", "tagline": "One payment, Oly's home forever. No more bills.", "price": "$399.99", "badge": "Best Value" }
     },
     "payWithCrypto": "Pay with Crypto (USDT)",
     "cryptoInstructions": "Send exactly the amount below on the BEP20 (BNB Smart Chain) network only. Sending on any other network will result in permanent loss of funds.",
@@ -232,8 +233,9 @@
     "premium": {
       "title": "Onward Pro",
       "active": "You're Pro ✨",
-      "activePlan": { "monthly": "Monthly Buddy", "lifetime": "Lifetime Partner" },
-      "goPremium": "Go Premium"
+      "activePlan": { "monthly": "Monthly Buddy", "yearly": "Yearly Companion", "lifetime": "Lifetime Partner" },
+      "goPremium": "Go Premium",
+      "teaser": "Keep the Sanctuary growing and Oly's brain sharp."
     },
     "olySize": "Oly Size",
     "small": "Small",
