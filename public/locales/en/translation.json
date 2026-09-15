@@ -142,6 +142,28 @@
     "message": "Oops! Page not found",
     "returnHome": "Return to Home"
   },
+  "upgrade": {
+    "title": "Oly Needs a Little Fuel!",
+    "subtitle": "We've had an amazing 14 days together. To keep the Sanctuary growing and Oly's brain sharp, consider upgrading to Pro. You're not just buying an app; you're investing in your focus.",
+    "plans": {
+      "monthly": { "name": "Monthly Buddy", "tagline": "Perfect for a quick boost.", "price": "$4.99/mo" },
+      "lifetime": { "name": "Lifetime Partner", "tagline": "One payment, Oly's home forever. No more bills.", "price": "$49.00", "badge": "Best Value" }
+    },
+    "payWithCrypto": "Pay with Crypto (USDT)",
+    "cryptoInstructions": "Send exactly the amount below on the BEP20 (BNB Smart Chain) network only. Sending on any other network will result in permanent loss of funds.",
+    "amountLabel": "Amount",
+    "walletLabel": "Wallet address",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "txHashLabel": "Transaction hash",
+    "txHashPlaceholder": "Paste your transaction hash (0x...)",
+    "verifyButton": "I've Sent It — Verify Payment",
+    "verifying": "Verifying...",
+    "verifySuccessTitle": "Welcome to the Inner Circle!",
+    "verifySuccessBody": "Oly just did a backflip. Check your Room for your new Golden Badge!",
+    "verifyFailedTitle": "Payment not verified",
+    "maybeLater": "Maybe Later"
+  },
   "toasts": {
     "feathersEarnedTitle": "🪶 Feathers Earned!",
     "feathersEarnedBody": "+{{amount}} feathers added to your collection!",
@@ -207,6 +229,12 @@
     "profile": "Profile",
     "namePlaceholder": "Your name",
     "save": "Save",
+    "premium": {
+      "title": "Onward Pro",
+      "active": "You're Pro ✨",
+      "activePlan": { "monthly": "Monthly Buddy", "lifetime": "Lifetime Partner" },
+      "goPremium": "Go Premium"
+    },
     "olySize": "Oly Size",
     "small": "Small",
     "large": "Large",

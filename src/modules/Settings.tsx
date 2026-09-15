@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Volume2, Palette, Maximize, LogOut, Bell, Languages } from 'lucide-react';
+import { User, Volume2, Palette, Maximize, LogOut, Bell, Languages, Crown } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly } from '@/components/Oly';
@@ -10,6 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications, loadNotificationSettings, type NotificationSettings } from '@/hooks/useNotifications';
+import { usePremium } from '@/hooks/usePremium';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { useTranslation } from 'react-i18next';
 
 interface SettingsProps {
@@ -42,6 +44,8 @@ export function Settings({
   const { signOut } = useAuth();
   const { applySettings, sendToast } = useNotifications();
   const { t, i18n } = useTranslation();
+  const { isPremium, subscription, refresh: refreshPremium } = usePremium();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const AMBIENT_SOUNDS = AMBIENT_SOUND_KEYS.map(({ id, key, emoji }) => ({
     id,
     emoji,
@@ -115,6 +119,36 @@ export function Settings({
           </Button>
         </div>
       </GlassCard>
+
+      {/* Premium */}
+      <GlassCard className="mb-4" hover={false}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/20">
+              <Crown size={20} className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold">{t('settings.premium.title')}</h3>
+              {isPremium && subscription && (
+                <p className="text-xs text-muted-foreground">
+                  {t('settings.premium.active')} · {t(`settings.premium.activePlan.${subscription.plan}`)}
+                </p>
+              )}
+            </div>
+          </div>
+          {!isPremium && (
+            <Button size="sm" className="neon-glow shrink-0" onClick={() => setShowUpgradeModal(true)}>
+              {t('settings.premium.goPremium')}
+            </Button>
+          )}
+        </div>
+      </GlassCard>
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onVerified={refreshPremium}
+      />
 
       {/* Oly Size */}
       <GlassCard className="mb-4" hover={false}>

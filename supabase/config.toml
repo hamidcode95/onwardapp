@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-time-anchor-push]
 verify_jwt = false
+
+[functions.crypto-verify]
+verify_jwt = false

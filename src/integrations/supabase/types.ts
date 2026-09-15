@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      payments: {
+        Row: {
+          id: string
+          user_id: string
+          method: string
+          plan: string
+          amount: number
+          currency: string
+          status: string
+          provider_ref: string | null
+          created_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          method: string
+          plan: string
+          amount: number
+          currency: string
+          status?: string
+          provider_ref?: string | null
+          created_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          method?: string
+          plan?: string
+          amount?: number
+          currency?: string
+          status?: string
+          provider_ref?: string | null
+          created_at?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          user_id: string
+          plan: string
+          status: string
+          current_period_end: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          plan: string
+          status?: string
+          current_period_end?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          plan?: string
+          status?: string
+          current_period_end?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       time_anchors: {
         Row: {
           id: string

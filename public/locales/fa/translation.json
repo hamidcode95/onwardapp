@@ -142,6 +142,28 @@
     "message": "اوپس! صفحه پیدا نشد",
     "returnHome": "بازگشت به خانه"
   },
+  "upgrade": {
+    "title": "اولی یکم سوخت لازم داره!",
+    "subtitle": "۱۴ روز فوق‌العاده رو کنار هم گذروندیم. برای اینکه پناهگاه بزرگ‌تر بشه و ذهن اولی تیز بمونه، به ارتقا به Pro فکر کن. این فقط خرید یه اپ نیست؛ سرمایه‌گذاری روی تمرکز خودته.",
+    "plans": {
+      "monthly": { "name": "همراه ماهانه", "tagline": "برای یه انگیزه‌ی سریع عالیه.", "price": "$4.99/ماه" },
+      "lifetime": { "name": "همراه همیشگی", "tagline": "یه پرداخت، خونه‌ی اولی برای همیشه. دیگه قبضی در کار نیست.", "price": "$49.00", "badge": "بهترین ارزش" }
+    },
+    "payWithCrypto": "پرداخت با کریپتو (USDT)",
+    "cryptoInstructions": "دقیقاً مبلغ زیر رو فقط روی شبکه‌ی BEP20 (BNB Smart Chain) بفرست. ارسال روی هر شبکه‌ی دیگه‌ای باعث از دست رفتن دائمی پول می‌شه.",
+    "amountLabel": "مبلغ",
+    "walletLabel": "آدرس ولت",
+    "copy": "کپی",
+    "copied": "کپی شد!",
+    "txHashLabel": "هش تراکنش",
+    "txHashPlaceholder": "هش تراکنشت رو اینجا بچسبون (0x...)",
+    "verifyButton": "فرستادم — پرداخت رو تأیید کن",
+    "verifying": "در حال بررسی...",
+    "verifySuccessTitle": "به جمع داخلی خوش اومدی!",
+    "verifySuccessBody": "اولی یه پشتک زد! برو توی اتاقت نشان طلایی جدیدت رو ببین!",
+    "verifyFailedTitle": "پرداخت تأیید نشد",
+    "maybeLater": "شاید بعداً"
+  },
   "toasts": {
     "feathersEarnedTitle": "🪶 پَر جدید گرفتی!",
     "feathersEarnedBody": "+{{amount}} پَر به مجموعه‌ات اضافه شد!",
@@ -207,6 +229,12 @@
     "profile": "پروفایل",
     "namePlaceholder": "اسمت",
     "save": "ذخیره",
+    "premium": {
+      "title": "Onward Pro",
+      "active": "پرو هستی ✨",
+      "activePlan": { "monthly": "همراه ماهانه", "lifetime": "همراه همیشگی" },
+      "goPremium": "ارتقا به Pro"
+    },
     "olySize": "اندازه‌ی اولی",
     "small": "کوچیک",
     "large": "بزرگ",
