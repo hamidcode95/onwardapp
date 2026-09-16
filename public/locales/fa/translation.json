@@ -38,6 +38,7 @@
     "pause": "توقف",
     "resume": "ادامه",
     "sessionComplete": "🎉 جلسه تموم شد!",
+    "proOnly": "اولی داره استراحت می‌کنه — با Pro بیشتر بیدار می‌مونه",
     "focusedFor": "{{minutes}} دقیقه تمرکز کردی. آفرین!"
   },
   "brainDump": {
@@ -105,6 +106,7 @@
     "shopTitle": "🏡 فروشگاه پناهگاه",
     "shopSubtitle": "خونه‌ی اولی رو تزئین کن",
     "owned": "✓ خریداری‌شده",
+    "proOnly": "مخصوص اعضای Pro",
     "items": {
       "mug": { "name": "لیوان سوخت مغز", "description": "یه لیوان داغ کنار اولی" },
       "plant": { "name": "گیاه مینیمال", "description": "گیاه سیج خط‌نگار" },

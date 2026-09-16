@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Crown } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { ModuleHeader } from '@/components/ModuleHeader';
 import { Oly, OlyState } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { usePremium } from '@/hooks/usePremium';
+import { UpgradeModal } from '@/components/UpgradeModal';
 
 interface FocusRoomProps {
   onBack: () => void;
@@ -13,6 +15,10 @@ interface FocusRoomProps {
 }
 
 type TimerOption = { label: string; minutes: number };
+
+// Free accounts are capped at the 15-minute Sprint; longer sessions need
+// Onward Pro (see the Business Model doc's FocusRoom restriction).
+const FREE_MAX_MINUTES = 15;
 
 const TIMER_OPTION_KEYS: { key: string; minutes: number }[] = [
   { key: 'sprint15', minutes: 15 },
@@ -22,6 +28,8 @@ const TIMER_OPTION_KEYS: { key: string; minutes: number }[] = [
 
 export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
   const { t } = useTranslation();
+  const { isPremium, refresh: refreshPremium } = usePremium();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const TIMER_OPTIONS: TimerOption[] = TIMER_OPTION_KEYS.map(({ key, minutes }) => ({
     label: t(`focusRoom.${key}`),
     minutes,
@@ -191,15 +199,24 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
           <p className="text-center text-muted-foreground mb-4">
             {t('focusRoom.chooseSession')}
           </p>
-          {TIMER_OPTIONS.map((option) => (
-            <GlassCard
-              key={option.minutes}
-              onClick={() => startTimer(option)}
-              className="text-center"
-            >
-              <span className="font-semibold text-lg">{option.label}</span>
-            </GlassCard>
-          ))}
+          {TIMER_OPTIONS.map((option) => {
+            const isLocked = !isPremium && option.minutes > FREE_MAX_MINUTES;
+            return (
+              <GlassCard
+                key={option.minutes}
+                onClick={() => (isLocked ? setShowUpgradeModal(true) : startTimer(option))}
+                className={isLocked ? 'text-center opacity-70' : 'text-center'}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span className="font-semibold text-lg">{option.label}</span>
+                  {isLocked && <Crown size={16} className="text-[hsl(45,90%,55%)]" />}
+                </div>
+                {isLocked && (
+                  <p className="mt-1 text-xs text-muted-foreground">{t('focusRoom.proOnly')}</p>
+                )}
+              </GlassCard>
+            );
+          })}
         </div>
       ) : (
         <div className="flex justify-center gap-4">
@@ -240,6 +257,12 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
           </GlassCard>
         </motion.div>
       )}
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onVerified={refreshPremium}
+      />
     </div>
   );
 }

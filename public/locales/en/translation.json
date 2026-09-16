@@ -38,6 +38,7 @@
     "pause": "Pause",
     "resume": "Resume",
     "sessionComplete": "🎉 Session Complete!",
+    "proOnly": "Oly is resting — Pro keeps Oly awake longer",
     "focusedFor": "You focused for {{minutes}} minutes. Great work!"
   },
   "brainDump": {
@@ -105,6 +106,7 @@
     "shopTitle": "🏡 Sanctuary Shop",
     "shopSubtitle": "Decorate Oly's room",
     "owned": "✓ Owned",
+    "proOnly": "Pro members only",
     "items": {
       "mug": { "name": "Brain Fuel Mug", "description": "A steaming mug near Oly" },
       "plant": { "name": "Minimalist Plant", "description": "Line-art sage plant" },

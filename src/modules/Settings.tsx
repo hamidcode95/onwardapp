@@ -121,17 +121,18 @@ export function Settings({
       </GlassCard>
 
       {/* Premium — deliberately styled apart from the other settings
-          cards (gradient + glow border) so it reads as a distinct,
-          higher-stakes call to action rather than blending in. */}
-      <div className="mb-4 rounded-xl border-2 border-primary/50 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-5 shadow-[0_0_24px_hsla(150,47%,71%,0.25)]">
+          cards (golden theme, per the business-model spec) so it reads
+          as a distinct, higher-stakes call to action rather than
+          blending in with the app's normal sage-green palette. */}
+      <div className="mb-4 rounded-xl border-2 border-[hsl(45,90%,55%)]/50 bg-gradient-to-br from-[hsl(45,90%,55%)]/20 via-[hsl(45,90%,55%)]/10 to-transparent p-5 shadow-[0_0_24px_hsla(45,90%,55%,0.25)]">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/25">
-            <Crown size={28} className="text-primary" />
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[hsl(45,90%,55%)]/25">
+            <Crown size={28} className="text-[hsl(45,90%,55%)]" />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold text-foreground">{t('settings.premium.title')}</h3>
             {isPremium && subscription ? (
-              <p className="text-sm text-primary">
+              <p className="text-sm text-[hsl(45,90%,55%)]">
                 {t('settings.premium.active')} · {t(`settings.premium.activePlan.${subscription.plan}`)}
               </p>
             ) : (
@@ -142,7 +143,7 @@ export function Settings({
         {!isPremium && (
           <Button
             size="lg"
-            className="mt-4 w-full neon-glow text-base font-semibold"
+            className="mt-4 w-full bg-[hsl(45,90%,55%)] text-black hover:bg-[hsl(45,90%,55%)]/90 shadow-[0_0_20px_hsla(45,90%,55%,0.35)] text-base font-semibold"
             onClick={() => setShowUpgradeModal(true)}
           >
             <Crown size={18} className="mr-2" />

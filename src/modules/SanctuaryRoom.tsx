@@ -5,9 +5,14 @@ import { Oly } from '@/components/Oly';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/GlassCard';
 import { useTranslation } from 'react-i18next';
+import { usePremium } from '@/hooks/usePremium';
+import { UpgradeModal } from '@/components/UpgradeModal';
+import { Crown } from 'lucide-react';
 import type { TFunction } from 'i18next';
 
 interface ShopItem {
+  /** Pro-only decoration — locked behind Onward Pro for free users. */
+  premium?: boolean;
   id: string;
   name: string;
   cost: number;
@@ -19,8 +24,8 @@ function getShopItems(t: TFunction): ShopItem[] {
   return [
     { id: 'mug', name: t('sanctuary.items.mug.name'), cost: 15, emoji: '☕', description: t('sanctuary.items.mug.description') },
     { id: 'plant', name: t('sanctuary.items.plant.name'), cost: 30, emoji: '🌿', description: t('sanctuary.items.plant.description') },
-    { id: 'rug', name: t('sanctuary.items.rug.name'), cost: 50, emoji: '🟤', description: t('sanctuary.items.rug.description') },
-    { id: 'lamp', name: t('sanctuary.items.lamp.name'), cost: 100, emoji: '💡', description: t('sanctuary.items.lamp.description') },
+    { id: 'rug', name: t('sanctuary.items.rug.name'), cost: 50, emoji: '🟤', description: t('sanctuary.items.rug.description'), premium: true },
+    { id: 'lamp', name: t('sanctuary.items.lamp.name'), cost: 100, emoji: '💡', description: t('sanctuary.items.lamp.description'), premium: true },
   ];
 }
 
@@ -244,6 +249,8 @@ function Whiteboard({ onClick, isNight, isRtl }: { onClick: () => void; isNight:
 export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: SanctuaryRoomProps) {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === 'rtl';
+  const { isPremium, refresh: refreshPremium } = usePremium();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const SHOP_ITEMS = getShopItems(t);
   const EARN_GUIDE = getEarnGuide(t);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
@@ -385,18 +392,32 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
                 {SHOP_ITEMS.map(item => {
                   const owned = purchasedItems.includes(item.id);
                   const canAfford = feathers >= item.cost;
+                  const locked = Boolean(item.premium) && !isPremium;
                   return (
-                    <GlassCard key={item.id} hover={false}>
+                    <GlassCard key={item.id} hover={false} className={locked ? 'opacity-70' : ''}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{item.emoji}</span>
                           <div>
-                            <h4 className="font-semibold text-foreground text-sm">{item.name}</h4>
-                            <p className="text-xs text-muted-foreground">{item.description}</p>
+                            <h4 className="font-semibold text-foreground text-sm flex items-center gap-1.5">
+                              {item.name}
+                              {item.premium && <Crown size={13} className="text-[hsl(45,90%,55%)]" />}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {locked ? t('sanctuary.proOnly') : item.description}
+                            </p>
                           </div>
                         </div>
                         {owned ? (
                           <span className="text-xs text-primary font-semibold px-3 py-1 rounded-full border border-primary/30">{t('sanctuary.owned')}</span>
+                        ) : locked ? (
+                          <Button
+                            size="sm"
+                            className="bg-[hsl(45,90%,55%)] text-black hover:bg-[hsl(45,90%,55%)]/90"
+                            onClick={() => setShowUpgradeModal(true)}
+                          >
+                            <Crown size={14} />
+                          </Button>
                         ) : (
                           <Button size="sm" disabled={!canAfford} className={canAfford ? 'neon-glow' : ''} onClick={() => onPurchase(item.id, item.cost)}>
                             🪶 {item.cost}
@@ -411,6 +432,12 @@ export function SanctuaryRoom({ onBack, feathers, purchasedItems, onPurchase }: 
           </motion.div>
         )}
       </AnimatePresence>
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onVerified={refreshPremium}
+      />
     </motion.div>
   );
 }

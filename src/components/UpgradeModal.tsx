@@ -90,18 +90,18 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 260 }}
-            className="w-full max-w-sm"
+            className="w-full max-w-sm rounded-2xl border-2 border-[hsl(45,90%,55%)]/40 bg-background/40 p-4 shadow-[0_0_30px_hsla(45,90%,55%,0.2)]"
           >
             {verifiedSuccess ? (
               <GlassCard hover={false} className="text-center">
                 <div className="mb-4 flex justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(45,90%,55%)]/15 text-[hsl(45,90%,55%)]">
                     <Sparkles size={28} />
                   </div>
                 </div>
                 <h2 className="mb-2 text-xl font-bold text-foreground">{t('upgrade.verifySuccessTitle')}</h2>
                 <p className="mb-6 text-muted-foreground">{t('upgrade.verifySuccessBody')}</p>
-                <Button className="w-full neon-glow" onClick={handleClose}>
+                <Button className="w-full bg-[hsl(45,90%,55%)] text-black hover:bg-[hsl(45,90%,55%)]/90 shadow-[0_0_20px_hsla(45,90%,55%,0.35)]" onClick={handleClose}>
                   {t('common.gotIt')}
                 </Button>
               </GlassCard>
@@ -122,14 +122,14 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
                         onClick={() => setSelectedPlan(plan)}
                         className={`cursor-pointer border-2 transition-all duration-150 ${
                           isSelected
-                            ? 'border-primary bg-primary/10 shadow-[0_0_16px_hsla(150,47%,71%,0.35)]'
-                            : 'border-transparent hover:border-primary/30'
+                            ? 'border-[hsl(45,90%,55%)] bg-[hsl(45,90%,55%)]/10 shadow-[0_0_16px_hsla(45,90%,55%,0.35)]'
+                            : 'border-transparent hover:border-[hsl(45,90%,55%)]/30'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                              isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                              isSelected ? 'border-[hsl(45,90%,55%)] bg-[hsl(45,90%,55%)]' : 'border-muted-foreground/40'
                             }`}
                           >
                             {isSelected && <Check size={13} className="text-background" strokeWidth={3} />}
@@ -138,21 +138,21 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-foreground">{t(`upgrade.plans.${plan}.name`)}</span>
                               {(plan === 'yearly' || plan === 'lifetime') && (
-                                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                <span className="rounded-full bg-[hsl(45,90%,55%)]/15 px-2 py-0.5 text-[10px] font-semibold text-[hsl(45,90%,55%)]">
                                   {t(`upgrade.plans.${plan}.badge`)}
                                 </span>
                               )}
                             </div>
                             <p className="text-xs text-muted-foreground">{t(`upgrade.plans.${plan}.tagline`)}</p>
                           </div>
-                          <span className="shrink-0 font-bold text-primary">{t(`upgrade.plans.${plan}.price`)}</span>
+                          <span className="shrink-0 font-bold text-[hsl(45,90%,55%)]">{t(`upgrade.plans.${plan}.price`)}</span>
                         </div>
                       </GlassCard>
                     );
                   })}
                 </div>
 
-                <Button className="w-full neon-glow" onClick={() => setShowCryptoFlow(true)}>
+                <Button className="w-full bg-[hsl(45,90%,55%)] text-black hover:bg-[hsl(45,90%,55%)]/90 shadow-[0_0_20px_hsla(45,90%,55%,0.35)]" onClick={() => setShowCryptoFlow(true)}>
                   <Wallet size={18} className="mr-2" />
                   {t('upgrade.payWithCrypto')}
                 </Button>
@@ -165,13 +165,13 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
               </>
             ) : (
               <GlassCard hover={false}>
-                <p className="mb-4 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs text-foreground">
+                <p className="mb-4 rounded-lg border border-[hsl(45,90%,55%)]/40 bg-[hsl(45,90%,55%)]/5 p-3 text-xs text-foreground">
                   {t('upgrade.cryptoInstructions')}
                 </p>
 
                 <div className="mb-4">
                   <label className="mb-1 block text-xs text-muted-foreground">{t('upgrade.amountLabel')}</label>
-                  <div className="font-mono text-lg font-bold text-primary">
+                  <div className="font-mono text-lg font-bold text-[hsl(45,90%,55%)]">
                     {PLAN_AMOUNTS[selectedPlan]} USDT
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
                       className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
                       aria-label={t('upgrade.copy')}
                     >
-                      {walletCopied ? <Check size={16} className="text-primary" /> : <Copy size={16} />}
+                      {walletCopied ? <Check size={16} className="text-[hsl(45,90%,55%)]" /> : <Copy size={16} />}
                     </button>
                   </div>
                 </div>
@@ -207,7 +207,7 @@ export function UpgradeModal({ open, onClose, onVerified }: UpgradeModalProps) {
                 )}
 
                 <Button
-                  className="w-full neon-glow"
+                  className="w-full bg-[hsl(45,90%,55%)] text-black hover:bg-[hsl(45,90%,55%)]/90 shadow-[0_0_20px_hsla(45,90%,55%,0.35)]"
                   onClick={handleVerify}
                   disabled={!txHash.trim() || isVerifying}
                 >
