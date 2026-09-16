@@ -79,14 +79,33 @@
 }
 
 @layer base {
-  /* Sonner's own mobile CSS sets left + right + width:100% together on
-     [data-sonner-toaster], which is over-constrained and makes the toast
-     container ~16px wider than the viewport — the app "oversizes" on
-     Oly's messages. Overriding width here keeps the same 16px side
-     margins without the overflow. */
+  /* Sonner's mobile CSS sets left + right + width:100% together on
+     [data-sonner-toaster], which is over-constrained: the browser drops
+     one of them, so the toaster ends up wider than the viewport (the app
+     appears zoomed out) and/or shifted off-screen so Oly's messages get
+     clipped.
+
+     Fixing width alone isn't enough — with the width corrected, the
+     stale left/right pair still pushes the box off to one side. Pinning
+     left explicitly and neutralizing right gives the toaster one
+     unambiguous position, 16px in from the screen edge. */
   @media (max-width: 600px) {
     [data-sonner-toaster] {
-      width: calc(100% - 32px) !important;
+      width: calc(100vw - 32px) !important;
+      max-width: calc(100vw - 32px) !important;
+      left: 16px !important;
+      right: auto !important;
+      transform: none !important;
+    }
+
+    /* The toast itself must not exceed its (now correct) container, and
+       long Persian/English message bodies need to wrap rather than run
+       past the edge. */
+    [data-sonner-toast] {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+      overflow-wrap: anywhere;
     }
   }
 }

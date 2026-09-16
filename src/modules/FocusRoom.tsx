@@ -8,17 +8,14 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { usePremium } from '@/hooks/usePremium';
 import { UpgradeModal } from '@/components/UpgradeModal';
+import { ScrollPicker } from '@/components/ScrollPicker';
 
 interface FocusRoomProps {
   onBack: () => void;
   onComplete?: (minutes: number) => void;
 }
 
-type TimerOption = { label: string; minutes: number };
-
-// Free accounts are capped at the 15-minute Sprint; longer sessions need
-// Onward Pro (see the Business Model doc's FocusRoom restriction).
-const FREE_MAX_MINUTES = 15;
+type TimerOption = { label: string; totalSeconds: number };
 
 const TIMER_OPTION_KEYS: { key: string; minutes: number }[] = [
   { key: 'sprint15', minutes: 15 },
@@ -26,14 +23,22 @@ const TIMER_OPTION_KEYS: { key: string; minutes: number }[] = [
   { key: 'epic45', minutes: 45 },
 ];
 
+const HOURS = Array.from({ length: 13 }, (_, i) => i); // 0–12
+const SIXTY = Array.from({ length: 60 }, (_, i) => i);
+
 export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
   const { t } = useTranslation();
   const { isPremium, refresh: refreshPremium } = usePremium();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const TIMER_OPTIONS: TimerOption[] = TIMER_OPTION_KEYS.map(({ key, minutes }) => ({
     label: t(`focusRoom.${key}`),
-    minutes,
+    totalSeconds: minutes * 60,
   }));
+
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  const [customHours, setCustomHours] = useState(0);
+  const [customMinutes, setCustomMinutes] = useState(25);
+  const [customSeconds, setCustomSeconds] = useState(0);
 
   const [selectedTimer, setSelectedTimer] = useState<TimerOption | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -80,11 +85,11 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
     if (!selectedTimer) return 0;
     if (isRunning && endAt !== null) return Math.max(0, endAt - now);
     if (remainingWhenPausedMs !== null) return remainingWhenPausedMs;
-    return selectedTimer.minutes * 60 * 1000;
+    return selectedTimer.totalSeconds * 1000;
   })();
   const timeLeft = Math.ceil(timeLeftMs / 1000);
 
-  const totalSeconds = selectedTimer ? selectedTimer.minutes * 60 : 0;
+  const totalSeconds = selectedTimer ? selectedTimer.totalSeconds : 0;
   const progress = totalSeconds > 0 ? ((totalSeconds - timeLeft) / totalSeconds) * 100 : 0;
 
   const getOlyState = (): OlyState => {
@@ -94,9 +99,13 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
   };
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const mm = m.toString().padStart(2, '0');
+    const ss = s.toString().padStart(2, '0');
+    // Only show the hours segment when a custom session actually needs it.
+    return h > 0 ? `${h.toString().padStart(2, '0')}:${mm}:${ss}` : `${mm}:${ss}`;
   };
 
   const handleComplete = useCallback((minutes: number) => {
@@ -111,12 +120,19 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
 
   const startTimer = (option: TimerOption) => {
     setSelectedTimer(option);
+    setShowCustomPicker(false);
     setRemainingWhenPausedMs(null);
     setIsComplete(false);
     completedFiredRef.current = false;
-    setEndAt(Date.now() + option.minutes * 60 * 1000);
+    setEndAt(Date.now() + option.totalSeconds * 1000);
     setIsRunning(true);
     setNow(Date.now());
+  };
+
+  const startCustomTimer = () => {
+    const total = customHours * 3600 + customMinutes * 60 + customSeconds;
+    if (total <= 0) return;
+    startTimer({ label: t('focusRoom.customLabel'), totalSeconds: total });
   };
 
   const pauseTimer = () => {
@@ -155,7 +171,9 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
     if (!isRunning || endAt === null || isComplete) return;
     if (now >= endAt && !completedFiredRef.current && selectedTimer) {
       completedFiredRef.current = true;
-      handleComplete(selectedTimer.minutes);
+      // Round to the nearest minute for stats/notification copy — a
+      // custom 90-second session still counts as meaningful focus time.
+      handleComplete(Math.max(1, Math.round(selectedTimer.totalSeconds / 60)));
     }
   }, [now, isRunning, endAt, isComplete, selectedTimer, handleComplete]);
 
@@ -199,24 +217,57 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
           <p className="text-center text-muted-foreground mb-4">
             {t('focusRoom.chooseSession')}
           </p>
-          {TIMER_OPTIONS.map((option) => {
-            const isLocked = !isPremium && option.minutes > FREE_MAX_MINUTES;
-            return (
-              <GlassCard
-                key={option.minutes}
-                onClick={() => (isLocked ? setShowUpgradeModal(true) : startTimer(option))}
-                className={isLocked ? 'text-center opacity-70' : 'text-center'}
+          {TIMER_OPTIONS.map((option) => (
+            <GlassCard
+              key={option.totalSeconds}
+              onClick={() => startTimer(option)}
+              className="text-center"
+            >
+              <span className="font-semibold text-lg">{option.label}</span>
+            </GlassCard>
+          ))}
+
+          {/* Custom timer — the Pro-gated option. Free users see the card
+              with a crown and get the upgrade modal; Pro users expand an
+              h/m/s picker with no duration cap. */}
+          {!isPremium ? (
+            <GlassCard onClick={() => setShowUpgradeModal(true)} className="text-center opacity-70">
+              <div className="flex items-center justify-center gap-2">
+                <span className="font-semibold text-lg">{t('focusRoom.customTimer')}</span>
+                <Crown size={16} className="text-[hsl(45,90%,55%)]" />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{t('focusRoom.proOnly')}</p>
+            </GlassCard>
+          ) : !showCustomPicker ? (
+            <GlassCard onClick={() => setShowCustomPicker(true)} className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="font-semibold text-lg">{t('focusRoom.customTimer')}</span>
+                <Crown size={16} className="text-[hsl(45,90%,55%)]" />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{t('focusRoom.customTimerPro')}</p>
+            </GlassCard>
+          ) : (
+            <GlassCard hover={false}>
+              <div className="mb-3 flex items-center justify-center gap-2">
+                <span className="font-semibold">{t('focusRoom.customTimer')}</span>
+                <Crown size={16} className="text-[hsl(45,90%,55%)]" />
+              </div>
+              <div className="mb-4 flex items-center justify-center gap-2">
+                <ScrollPicker values={HOURS} value={customHours} onChange={setCustomHours} label={t('focusRoom.hours')} />
+                <span className="mt-5 text-xl font-bold text-muted-foreground">:</span>
+                <ScrollPicker values={SIXTY} value={customMinutes} onChange={setCustomMinutes} label={t('focusRoom.minutes')} />
+                <span className="mt-5 text-xl font-bold text-muted-foreground">:</span>
+                <ScrollPicker values={SIXTY} value={customSeconds} onChange={setCustomSeconds} label={t('focusRoom.seconds')} />
+              </div>
+              <Button
+                className="w-full neon-glow"
+                onClick={startCustomTimer}
+                disabled={customHours === 0 && customMinutes === 0 && customSeconds === 0}
               >
-                <div className="flex items-center justify-center gap-2">
-                  <span className="font-semibold text-lg">{option.label}</span>
-                  {isLocked && <Crown size={16} className="text-[hsl(45,90%,55%)]" />}
-                </div>
-                {isLocked && (
-                  <p className="mt-1 text-xs text-muted-foreground">{t('focusRoom.proOnly')}</p>
-                )}
-              </GlassCard>
-            );
-          })}
+                {t('focusRoom.startCustom')}
+              </Button>
+            </GlassCard>
+          )}
         </div>
       ) : (
         <div className="flex justify-center gap-4">
@@ -252,7 +303,7 @@ export function FocusRoom({ onBack, onComplete }: FocusRoomProps) {
           <GlassCard className="neon-glow" hover={false}>
             <h3 className="text-xl font-bold text-primary mb-2">{t('focusRoom.sessionComplete')}</h3>
             <p className="text-muted-foreground">
-              {t('focusRoom.focusedFor', { minutes: selectedTimer?.minutes })}
+              {t('focusRoom.focusedFor', { minutes: selectedTimer ? Math.max(1, Math.round(selectedTimer.totalSeconds / 60)) : 0 })}
             </p>
           </GlassCard>
         </motion.div>

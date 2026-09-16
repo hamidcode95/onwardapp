@@ -28,7 +28,9 @@ export function loadNotificationSettings(): NotificationSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {}
+  } catch {
+    // Corrupt or unreadable localStorage — fall back to defaults.
+  }
   return DEFAULT_SETTINGS;
 }
 
@@ -40,8 +42,6 @@ import { notifications } from '@/lib/notifications';
 
 export function useNotifications() {
   const { t } = useTranslation();
-  const focusReminderRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const motivationRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const requestPermission = useCallback(async () => {
     return notifications.requestPermission();
@@ -61,7 +61,15 @@ export function useNotifications() {
 
   const notify = useCallback((title: string, body: string, type: 'info' | 'success' | 'warning' = 'info') => {
     sendToast(title, body, type);
-    if (document.hidden) sendPushNotification(title, body);
+    // Always fire the system notification too, not just when the tab is
+    // hidden. The old `if (document.hidden)` guard was self-defeating:
+    // these are driven by setInterval, which browsers throttle or suspend
+    // precisely when the tab IS hidden — so the branch that was supposed
+    // to deliver a real notification almost never ran, and reminders
+    // appeared to be toast-only/decorative. Sonner's toast is harmless
+    // when the app is in the foreground, and the system notification is
+    // what makes the reminder reachable when it isn't.
+    sendPushNotification(title, body);
   }, [sendToast, sendPushNotification]);
 
   const notifyTaskComplete = useCallback(() => {
@@ -78,32 +86,61 @@ export function useNotifications() {
   }, [notify, sendPushNotification, t]);
 
   const stopAllReminders = useCallback(() => {
-    if (focusReminderRef.current) { clearInterval(focusReminderRef.current); focusReminderRef.current = null; }
-    if (motivationRef.current) { clearInterval(motivationRef.current); motivationRef.current = null; }
+    focusDueAtRef.current = null;
+    motivationDueAtRef.current = null;
   }, []);
 
+  // Reminders are driven by a due-timestamp compared against the wall
+  // clock, not by trusting setInterval to have fired on schedule. A
+  // backgrounded/throttled tab used to mean a 20-minute reminder might
+  // arrive an hour late (or never); now the ticker below simply checks
+  // "is now past due?" every 15s, and a resync on visibilitychange makes
+  // a returning user get anything that came due while they were away.
+  const motivationDueAtRef = useRef<number | null>(null);
+  const focusDueAtRef = useRef<number | null>(null);
+
   const startMotivationLoop = useCallback((intervalMin?: number) => {
-    if (motivationRef.current) clearInterval(motivationRef.current);
     const settings = loadNotificationSettings();
-    if (!settings.motivationEnabled) { motivationRef.current = null; return; }
+    if (!settings.motivationEnabled) { motivationDueAtRef.current = null; return; }
     const mins = intervalMin ?? settings.motivationIntervalMin;
-    motivationRef.current = setInterval(() => {
-      const messages = t('toasts.motivational', { returnObjects: true }) as MessagePair[];
-      const msg = getRandomMessage(messages);
-      notify(msg.title, msg.body);
-    }, mins * 60 * 1000);
-  }, [notify, t]);
+    motivationDueAtRef.current = Date.now() + mins * 60 * 1000;
+  }, []);
 
   const startFocusReminders = useCallback((intervalMin?: number) => {
-    if (focusReminderRef.current) clearInterval(focusReminderRef.current);
     const settings = loadNotificationSettings();
-    if (!settings.focusRemindersEnabled) { focusReminderRef.current = null; return; }
+    if (!settings.focusRemindersEnabled) { focusDueAtRef.current = null; return; }
     const mins = intervalMin ?? settings.focusReminderIntervalMin;
-    focusReminderRef.current = setInterval(() => {
-      const messages = t('toasts.focusReminders', { returnObjects: true }) as MessagePair[];
-      const msg = getRandomMessage(messages);
-      notify(msg.title, msg.body, 'warning');
-    }, mins * 60 * 1000);
+    focusDueAtRef.current = Date.now() + mins * 60 * 1000;
+  }, []);
+
+  // Single ticker serving both reminder kinds.
+  useEffect(() => {
+    const check = () => {
+      const now = Date.now();
+      const settings = loadNotificationSettings();
+
+      if (settings.motivationEnabled && motivationDueAtRef.current !== null && now >= motivationDueAtRef.current) {
+        const messages = t('toasts.motivational', { returnObjects: true }) as MessagePair[];
+        const msg = getRandomMessage(messages);
+        notify(msg.title, msg.body);
+        motivationDueAtRef.current = now + settings.motivationIntervalMin * 60 * 1000;
+      }
+
+      if (settings.focusRemindersEnabled && focusDueAtRef.current !== null && now >= focusDueAtRef.current) {
+        const messages = t('toasts.focusReminders', { returnObjects: true }) as MessagePair[];
+        const msg = getRandomMessage(messages);
+        notify(msg.title, msg.body, 'warning');
+        focusDueAtRef.current = now + settings.focusReminderIntervalMin * 60 * 1000;
+      }
+    };
+
+    const ticker = setInterval(check, 15 * 1000);
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(ticker);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [notify, t]);
 
   const applySettings = useCallback((settings: NotificationSettings) => {
@@ -112,10 +149,6 @@ export function useNotifications() {
     if (settings.motivationEnabled) startMotivationLoop(settings.motivationIntervalMin);
     if (settings.focusRemindersEnabled) startFocusReminders(settings.focusReminderIntervalMin);
   }, [stopAllReminders, startMotivationLoop, startFocusReminders]);
-
-  useEffect(() => {
-    return () => stopAllReminders();
-  }, [stopAllReminders]);
 
   return {
     requestPermission,

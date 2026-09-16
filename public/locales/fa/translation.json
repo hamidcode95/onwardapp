@@ -39,6 +39,13 @@
     "resume": "ادامه",
     "sessionComplete": "🎉 جلسه تموم شد!",
     "proOnly": "اولی داره استراحت می‌کنه — با Pro بیشتر بیدار می‌مونه",
+    "customTimer": "تایمر دلخواه",
+    "customTimerPro": "هر مدت‌زمانی که بخوای تنظیم کن",
+    "hours": "ساعت",
+    "minutes": "دقیقه",
+    "seconds": "ثانیه",
+    "startCustom": "شروع جلسه‌ی دلخواه",
+    "customLabel": "دلخواه",
     "focusedFor": "{{minutes}} دقیقه تمرکز کردی. آفرین!"
   },
   "brainDump": {

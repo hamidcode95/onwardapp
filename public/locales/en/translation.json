@@ -39,6 +39,13 @@
     "resume": "Resume",
     "sessionComplete": "🎉 Session Complete!",
     "proOnly": "Oly is resting — Pro keeps Oly awake longer",
+    "customTimer": "Custom Timer",
+    "customTimerPro": "Set any duration you want",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "startCustom": "Start Custom Session",
+    "customLabel": "Custom",
     "focusedFor": "You focused for {{minutes}} minutes. Great work!"
   },
   "brainDump": {
