@@ -17,59 +17,73 @@ interface Badge {
   icon: React.ReactNode;
   title: string;
   description: string;
-  unlocked: boolean;
+  /** How far the user has come, in the badge's own unit. */
+  current: number;
+  /** What `current` has to reach for the badge to unlock. */
+  target: number;
 }
 
-export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: SuccessArchiveProps) {
-  const { t } = useTranslation();
-  const focusHours = Math.floor(totalFocusMinutes / 60);
-
-  const badges: Badge[] = [
+function buildBadges(t: TFunction, totalFocusMinutes: number, tasksCompleted: number): Badge[] {
+  const focusHours = totalFocusMinutes / 60;
+  return [
     {
       id: 'first_focus',
       icon: <Clock size={24} />,
       title: t('successArchive.badgeList.firstFocus.title'),
       description: t('successArchive.badgeList.firstFocus.description'),
-      unlocked: totalFocusMinutes > 0,
+      current: totalFocusMinutes > 0 ? 1 : 0,
+      target: 1,
     },
     {
       id: 'hour_master',
       icon: <Trophy size={24} />,
       title: t('successArchive.badgeList.hourMaster.title'),
       description: t('successArchive.badgeList.hourMaster.description'),
-      unlocked: focusHours >= 1,
+      // Counted in minutes rather than whole hours so the bar moves from
+      // the very first session instead of sitting empty until 60 minutes.
+      current: Math.min(totalFocusMinutes, 60),
+      target: 60,
     },
     {
       id: 'task_starter',
       icon: <CheckCircle size={24} />,
       title: t('successArchive.badgeList.taskStarter.title'),
       description: t('successArchive.badgeList.taskStarter.description'),
-      unlocked: tasksCompleted >= 5,
+      current: Math.min(tasksCompleted, 5),
+      target: 5,
     },
     {
       id: 'task_machine',
       icon: <TrendingUp size={24} />,
       title: t('successArchive.badgeList.taskMachine.title'),
       description: t('successArchive.badgeList.taskMachine.description'),
-      unlocked: tasksCompleted >= 25,
+      current: Math.min(tasksCompleted, 25),
+      target: 25,
     },
     {
       id: 'focus_champion',
       icon: <Trophy size={24} />,
       title: t('successArchive.badgeList.focusChampion.title'),
       description: t('successArchive.badgeList.focusChampion.description'),
-      unlocked: focusHours >= 10,
+      current: Math.min(Math.floor(focusHours), 10),
+      target: 10,
     },
     {
       id: 'task_legend',
       icon: <Trophy size={24} />,
       title: t('successArchive.badgeList.taskLegend.title'),
       description: t('successArchive.badgeList.taskLegend.description'),
-      unlocked: tasksCompleted >= 100,
+      current: Math.min(tasksCompleted, 100),
+      target: 100,
     },
   ];
+}
 
-  const unlockedCount = badges.filter(b => b.unlocked).length;
+export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: SuccessArchiveProps) {
+  const { t } = useTranslation();
+
+  const badges = buildBadges(t, totalFocusMinutes, tasksCompleted);
+  const unlockedCount = badges.filter((b) => b.current >= b.target).length;
 
   return (
     <div className="min-h-screen p-4">
@@ -106,34 +120,67 @@ export function SuccessArchive({ onBack, totalFocusMinutes, tasksCompleted }: Su
         {t('successArchive.badges')} ({unlockedCount}/{badges.length})
       </h3>
       <div className="grid grid-cols-2 gap-3">
-        {badges.map((badge, index) => (
-          <motion.div
-            key={badge.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <GlassCard 
-              hover={false}
-              className={badge.unlocked ? 'neon-glow' : 'opacity-50'}
+        {badges.map((badge, index) => {
+          const unlocked = badge.current >= badge.target;
+          const percent = Math.min(100, Math.round((badge.current / badge.target) * 100));
+
+          return (
+            <motion.div
+              key={badge.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
             >
-              <div className="text-center">
-                <div className={`mx-auto mb-2 ${badge.unlocked ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {badge.icon}
+              <GlassCard
+                hover={false}
+                className={`relative overflow-hidden ${unlocked ? 'neon-glow' : ''}`}
+              >
+                {/* "Filling glass" — a tinted level that rises from the
+                    bottom of the card as the user approaches the badge,
+                    so progress reads at a glance before the number does. */}
+                <motion.div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/15"
+                  initial={{ height: 0 }}
+                  animate={{ height: `${percent}%` }}
+                  transition={{ duration: 0.7, ease: 'easeOut', delay: index * 0.05 }}
+                  aria-hidden
+                />
+
+                <div className={`relative text-center ${unlocked ? '' : 'opacity-80'}`}>
+                  <div className={`mx-auto mb-2 ${unlocked ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {badge.icon}
+                  </div>
+                  <h4 className={`text-sm font-medium ${unlocked ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {badge.title}
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1">{badge.description}</p>
+
+                  {unlocked ? (
+                    <span className="inline-block mt-2 text-xs text-primary">
+                      {t('successArchive.unlocked')}
+                    </span>
+                  ) : (
+                    <div className="mt-2">
+                      <div className="mb-1 text-xs font-semibold text-primary">
+                        {badge.current}/{badge.target}
+                      </div>
+                      {/* Linear bar alongside the fill: the fill gives the
+                          feel, the bar gives precision. */}
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-background/60">
+                        <motion.div
+                          className="h-full rounded-full bg-primary"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percent}%` }}
+                          transition={{ duration: 0.7, ease: 'easeOut', delay: index * 0.05 }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <h4 className={`text-sm font-medium ${badge.unlocked ? 'text-foreground' : 'text-muted-foreground'}`}>
-                  {badge.title}
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {badge.description}
-                </p>
-                {badge.unlocked && (
-                  <span className="inline-block mt-2 text-xs text-primary">{t('successArchive.unlocked')}</span>
-                )}
-              </div>
-            </GlassCard>
-          </motion.div>
-        ))}
+              </GlassCard>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import { AlarmModal } from '@/components/AlarmModal';
 import { SanctuaryRoom } from '@/modules/SanctuaryRoom';
 import { TaskShredder } from '@/modules/TaskShredder';
 import { FocusRoom } from '@/modules/FocusRoom';
+import { useFocusSession, useFocusSessionCompletion } from '@/hooks/useFocusSession';
 import { BrainDump } from '@/modules/BrainDump';
 import { DecisionMaker } from '@/modules/DecisionMaker';
 import { MindScanner } from '@/modules/MindScanner';
@@ -102,6 +103,33 @@ const Index = () => {
     syncAnchorDelete(id);
     notifications.cancelScheduled(id);
   };
+
+  const handleFeatherEarn = useCallback((amount: number) => {
+    addFeathers(amount);
+    sendToast(t('toasts.feathersEarnedTitle'), t('toasts.feathersEarnedBody', { amount }));
+  }, [addFeathers, sendToast, t]);
+
+  // Focus session lives here, not inside FocusRoom, so leaving the Focus
+  // Room screen (or refreshing) can't kill a running timer.
+  const {
+    session: focusSession,
+    start: startFocusSession,
+    pause: pauseFocusSession,
+    resume: resumeFocusSession,
+    reset: resetFocusSession,
+    markCompleted: markFocusCompleted,
+  } = useFocusSession();
+
+  const handleFocusComplete = useCallback(
+    (minutes: number) => {
+      addFocusMinutes(minutes);
+      notifyFocusComplete(minutes);
+      handleFeatherEarn(50);
+    },
+    [addFocusMinutes, notifyFocusComplete, handleFeatherEarn],
+  );
+
+  useFocusSessionCompletion(focusSession, markFocusCompleted, handleFocusComplete);
 
   const handleDismissAlarm = (id: string) => {
     dismissAlarm(id, true);
@@ -205,11 +233,6 @@ const Index = () => {
 
   const goToHub = () => setActiveModule('hub');
 
-  const handleFeatherEarn = (amount: number) => {
-    addFeathers(amount);
-    sendToast(t('toasts.feathersEarnedTitle'), t('toasts.feathersEarnedBody', { amount }));
-  };
-
   const renderModule = () => {
     switch (activeModule) {
       case 'shredder':
@@ -218,11 +241,11 @@ const Index = () => {
         return (
           <FocusRoom
             onBack={goToHub}
-            onComplete={(minutes) => {
-              addFocusMinutes(minutes);
-              notifyFocusComplete(minutes);
-              handleFeatherEarn(50);
-            }}
+            session={focusSession}
+            onStart={startFocusSession}
+            onPause={pauseFocusSession}
+            onResume={resumeFocusSession}
+            onReset={resetFocusSession}
           />
         );
       case 'dump':
