@@ -28,6 +28,8 @@ import { QuickTimeAnchorCard } from '@/components/QuickTimeAnchorCard';
 import { syncAnchorCreate, syncAnchorDismiss, syncAnchorDelete } from '@/lib/anchorSync';
 import { notifications } from '@/lib/notifications';
 import { useTranslation } from 'react-i18next';
+import { useADHDProfile } from '@/hooks/useADHDProfile';
+import { ADHDProfileJourney } from '@/components/ADHDProfileJourney';
 
 type ActiveModule = 'hub' | 'shredder' | 'focus' | 'dump' | 'decision' | 'scanner' | 'archive' | 'settings' | 'chat' | 'sanctuary' | 'anchor';
 
@@ -108,6 +110,19 @@ const Index = () => {
     addFeathers(amount);
     sendToast(t('toasts.feathersEarnedTitle'), t('toasts.feathersEarnedBody', { amount }));
   }, [addFeathers, sendToast, t]);
+
+  const { hasCompletedProfile, loading: profileLoading, submitProfile } = useADHDProfile();
+  // Decoupled from hasCompletedProfile on purpose: that flips to true the
+  // moment the profile is saved (mid-Journey, before the result screen
+  // even renders), which would otherwise unmount the Journey out from
+  // under the user right as they're about to see their radar chart. Once
+  // shown, it only hides again when the Journey itself calls onDone.
+  const [showADHDJourney, setShowADHDJourney] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!profileLoading && showADHDJourney === null) {
+      setShowADHDJourney(!hasCompletedProfile);
+    }
+  }, [profileLoading, hasCompletedProfile, showADHDJourney]);
 
   // Focus session lives here, not inside FocusRoom, so leaving the Focus
   // Room screen (or refreshing) can't kill a running timer.
@@ -307,6 +322,13 @@ const Index = () => {
   };
 
   // Hub view
+  // First-login onboarding: whether to show it is decided once (see the
+  // showADHDJourney effect above) from Supabase, never from localStorage,
+  // so it correctly persists across refresh, logout/login, and devices.
+  if (user && showADHDJourney) {
+    return <ADHDProfileJourney onSubmit={submitProfile} onDone={() => setShowADHDJourney(false)} />;
+  }
+
   if (activeModule === 'hub') {
     return (
       <div className="min-h-screen bg-background p-4 pb-20 relative">

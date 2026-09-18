@@ -11,14 +11,38 @@
     "greeting": "Hey, {{name}}!",
     "subtitle": "What shall we tackle today?",
     "modules": {
-      "shredder": { "title": "Task Shredder", "description": "Break big goals into tiny bites" },
-      "focus": { "title": "Focus Room", "description": "Work alongside Oly with visual timers" },
-      "dump": { "title": "Brain Dump", "description": "Empty your mind instantly" },
-      "decision": { "title": "Decision Maker", "description": "Let Oly choose your next move" },
-      "scanner": { "title": "Mind Scanner", "description": "Check your mental fuel level" },
-      "archive": { "title": "Success Archive", "description": "Your wins and focus milestones" },
-      "chat": { "title": "Chat with Oly", "description": "Talk to your ADHD buddy" },
-      "sanctuary": { "title": "Oly's Sanctuary", "description": "Spend feathers, decorate home" }
+      "shredder": {
+        "title": "Task Shredder",
+        "description": "Break big goals into tiny bites"
+      },
+      "focus": {
+        "title": "Focus Room",
+        "description": "Work alongside Oly with visual timers"
+      },
+      "dump": {
+        "title": "Brain Dump",
+        "description": "Empty your mind instantly"
+      },
+      "decision": {
+        "title": "Decision Maker",
+        "description": "Let Oly choose your next move"
+      },
+      "scanner": {
+        "title": "Mind Scanner",
+        "description": "Check your mental fuel level"
+      },
+      "archive": {
+        "title": "Success Archive",
+        "description": "Your wins and focus milestones"
+      },
+      "chat": {
+        "title": "Chat with Oly",
+        "description": "Talk to your ADHD buddy"
+      },
+      "sanctuary": {
+        "title": "Oly's Sanctuary",
+        "description": "Spend feathers, decorate home"
+      }
     }
   },
   "feathers": "Feathers",
@@ -75,14 +99,38 @@
       "full": "Fully Charged!"
     },
     "recommendations": {
-      "rest": { "title": "Take a Rest", "description": "Your dopamine tank is low. Consider a short nap or break." },
-      "gentleFuel": { "title": "Gentle Fuel", "description": "Have some water or a light snack." },
-      "microTasks": { "title": "Micro-Tasks", "description": "Try the 15m Sprint in Focus Room for a quick win." },
-      "brainDump": { "title": "Brain Dump", "description": "Clear your mind in Brain Dump to feel lighter." },
-      "deepWork": { "title": "Deep Work", "description": "You're in a good zone! Try a 25m Deep Work session." },
-      "taskShredding": { "title": "Task Shredding", "description": "Great time to break down that big project." },
-      "epicMode": { "title": "Epic Mode", "description": "You're charged! Go for a 45m Epic focus session." },
-      "bigGoals": { "title": "Big Goals", "description": "Perfect time to tackle your most challenging task." }
+      "rest": {
+        "title": "Take a Rest",
+        "description": "Your dopamine tank is low. Consider a short nap or break."
+      },
+      "gentleFuel": {
+        "title": "Gentle Fuel",
+        "description": "Have some water or a light snack."
+      },
+      "microTasks": {
+        "title": "Micro-Tasks",
+        "description": "Try the 15m Sprint in Focus Room for a quick win."
+      },
+      "brainDump": {
+        "title": "Brain Dump",
+        "description": "Clear your mind in Brain Dump to feel lighter."
+      },
+      "deepWork": {
+        "title": "Deep Work",
+        "description": "You're in a good zone! Try a 25m Deep Work session."
+      },
+      "taskShredding": {
+        "title": "Task Shredding",
+        "description": "Great time to break down that big project."
+      },
+      "epicMode": {
+        "title": "Epic Mode",
+        "description": "You're charged! Go for a 45m Epic focus session."
+      },
+      "bigGoals": {
+        "title": "Big Goals",
+        "description": "Perfect time to tackle your most challenging task."
+      }
     }
   },
   "successArchive": {
@@ -91,12 +139,30 @@
     "badges": "Badges",
     "unlocked": "✓ Unlocked",
     "badgeList": {
-      "firstFocus": { "title": "First Focus", "description": "Complete your first focus session" },
-      "hourMaster": { "title": "Hour Master", "description": "Focus for 1 hour total" },
-      "taskStarter": { "title": "Task Starter", "description": "Complete 5 tasks" },
-      "taskMachine": { "title": "Task Machine", "description": "Complete 25 tasks" },
-      "focusChampion": { "title": "Focus Champion", "description": "Focus for 10 hours total" },
-      "taskLegend": { "title": "Task Legend", "description": "Complete 100 tasks" }
+      "firstFocus": {
+        "title": "First Focus",
+        "description": "Complete your first focus session"
+      },
+      "hourMaster": {
+        "title": "Hour Master",
+        "description": "Focus for 1 hour total"
+      },
+      "taskStarter": {
+        "title": "Task Starter",
+        "description": "Complete 5 tasks"
+      },
+      "taskMachine": {
+        "title": "Task Machine",
+        "description": "Complete 25 tasks"
+      },
+      "focusChampion": {
+        "title": "Focus Champion",
+        "description": "Focus for 10 hours total"
+      },
+      "taskLegend": {
+        "title": "Task Legend",
+        "description": "Complete 100 tasks"
+      }
     }
   },
   "olyChat": {
@@ -115,10 +181,22 @@
     "owned": "✓ Owned",
     "proOnly": "Pro members only",
     "items": {
-      "mug": { "name": "Brain Fuel Mug", "description": "A steaming mug near Oly" },
-      "plant": { "name": "Minimalist Plant", "description": "Line-art sage plant" },
-      "rug": { "name": "Cozy Rug", "description": "A soft rug for the room" },
-      "lamp": { "name": "Focus Lamp", "description": "Toggle room brightness" }
+      "mug": {
+        "name": "Brain Fuel Mug",
+        "description": "A steaming mug near Oly"
+      },
+      "plant": {
+        "name": "Minimalist Plant",
+        "description": "Line-art sage plant"
+      },
+      "rug": {
+        "name": "Cozy Rug",
+        "description": "A soft rug for the room"
+      },
+      "lamp": {
+        "name": "Focus Lamp",
+        "description": "Toggle room brightness"
+      }
     },
     "earnGuide": {
       "subtask": "Complete a sub-task",
@@ -155,9 +233,23 @@
     "title": "Oly Needs a Little Fuel!",
     "subtitle": "We've had an amazing 14 days together. To keep the Sanctuary growing and Oly's brain sharp, consider upgrading to Pro. You're not just buying an app; you're investing in your focus.",
     "plans": {
-      "monthly": { "name": "Monthly Buddy", "tagline": "Perfect for a quick boost.", "price": "$7.99/mo" },
-      "yearly": { "name": "Yearly Companion", "tagline": "The best of both worlds — save big, stay flexible.", "price": "$79.99/yr", "badge": "Save 17%" },
-      "lifetime": { "name": "Lifetime Partner", "tagline": "One payment, Oly's home forever. No more bills.", "price": "$399.99", "badge": "Best Value" }
+      "monthly": {
+        "name": "Monthly Buddy",
+        "tagline": "Perfect for a quick boost.",
+        "price": "$7.99/mo"
+      },
+      "yearly": {
+        "name": "Yearly Companion",
+        "tagline": "The best of both worlds — save big, stay flexible.",
+        "price": "$79.99/yr",
+        "badge": "Save 17%"
+      },
+      "lifetime": {
+        "name": "Lifetime Partner",
+        "tagline": "One payment, Oly's home forever. No more bills.",
+        "price": "$399.99",
+        "badge": "Best Value"
+      }
     },
     "payWithCrypto": "Pay with Crypto (USDT)",
     "cryptoInstructions": "Send exactly the amount below on the BEP20 (BNB Smart Chain) network only. Sending on any other network will result in permanent loss of funds.",
@@ -185,24 +277,66 @@
       "Take a deep breath... now let's go! 🧘"
     ],
     "motivational": [
-      { "title": "🌟 Oly says:", "body": "You're doing great! Keep going!" },
-      { "title": "💪 Nice!", "body": "Every small step counts. You're amazing!" },
-      { "title": "🧠 Oly's reminder:", "body": "Take a deep breath. Your focus is great!" },
-      { "title": "🎯 Focus!", "body": "You're getting closer to your goal!" },
-      { "title": "⭐ Oly's proud of you!", "body": "You're one of the best!" },
-      { "title": "🚀 Keep going!", "body": "You're on the right path, just keep going!" },
-      { "title": "🌿 Don't forget to rest!", "body": "A short break refreshes your mind." },
-      { "title": "✨ Shine moment!", "body": "Now is the best time to start!" }
+      {
+        "title": "🌟 Oly says:",
+        "body": "You're doing great! Keep going!"
+      },
+      {
+        "title": "💪 Nice!",
+        "body": "Every small step counts. You're amazing!"
+      },
+      {
+        "title": "🧠 Oly's reminder:",
+        "body": "Take a deep breath. Your focus is great!"
+      },
+      {
+        "title": "🎯 Focus!",
+        "body": "You're getting closer to your goal!"
+      },
+      {
+        "title": "⭐ Oly's proud of you!",
+        "body": "You're one of the best!"
+      },
+      {
+        "title": "🚀 Keep going!",
+        "body": "You're on the right path, just keep going!"
+      },
+      {
+        "title": "🌿 Don't forget to rest!",
+        "body": "A short break refreshes your mind."
+      },
+      {
+        "title": "✨ Shine moment!",
+        "body": "Now is the best time to start!"
+      }
     ],
     "focusReminders": [
-      { "title": "⏰ Focus time!", "body": "Let's start a focus session." },
-      { "title": "🎯 Focus challenge!", "body": "15 minutes of focus = 1 big win!" },
-      { "title": "🧘 Ready?", "body": "Oly is waiting for a Focus Sprint!" }
+      {
+        "title": "⏰ Focus time!",
+        "body": "Let's start a focus session."
+      },
+      {
+        "title": "🎯 Focus challenge!",
+        "body": "15 minutes of focus = 1 big win!"
+      },
+      {
+        "title": "🧘 Ready?",
+        "body": "Oly is waiting for a Focus Sprint!"
+      }
     ],
     "taskComplete": [
-      { "title": "🎉 Task complete!", "body": "Awesome! One more step forward!" },
-      { "title": "✅ Crushed it!", "body": "You demolished that task! What's next?" },
-      { "title": "🏆 Win!", "body": "Oly is happy! Keep going!" }
+      {
+        "title": "🎉 Task complete!",
+        "body": "Awesome! One more step forward!"
+      },
+      {
+        "title": "✅ Crushed it!",
+        "body": "You demolished that task! What's next?"
+      },
+      {
+        "title": "🏆 Win!",
+        "body": "Oly is happy! Keep going!"
+      }
     ],
     "focusSessionCompleteTitle": "🎉 Focus session complete!",
     "focusSessionCompleteBody": "You focused for {{minutes}} minutes! Great job!"
@@ -242,7 +376,11 @@
     "premium": {
       "title": "Onward Pro",
       "active": "You're Pro ✨",
-      "activePlan": { "monthly": "Monthly Buddy", "yearly": "Yearly Companion", "lifetime": "Lifetime Partner" },
+      "activePlan": {
+        "monthly": "Monthly Buddy",
+        "yearly": "Yearly Companion",
+        "lifetime": "Lifetime Partner"
+      },
       "goPremium": "Go Premium",
       "teaser": "Keep the Sanctuary growing and Oly's brain sharp."
     },
@@ -274,5 +412,86 @@
     "iosStep1": "Tap the <1>Share</1> button in Safari's toolbar",
     "iosStep2": "Scroll down and choose <1>Add to Home Screen</1>",
     "installNow": "Install Now"
+  },
+  "adhdProfile": {
+    "welcome": {
+      "title": "Oly wants to understand how your brain works.",
+      "subtitle": "Answer 10 quick questions so Onward can personalize your experience around you.",
+      "note": "Based on your experience during the past 6 months...",
+      "start": "Let's begin"
+    },
+    "progress": "{{current}}/{{total}}",
+    "back": "Back",
+    "questions": {
+      "q1": "When a task is boring or repetitive, how difficult is it for you to keep your attention until the end?",
+      "q2": "How often does your attention get pulled away by other thoughts, sounds, notifications, or things happening around you?",
+      "q3": "When you have several tasks or responsibilities at the same time, how difficult is it to organize them, set priorities, and manage your time?",
+      "q4": "How often do you forget something you intended to do, even though you had recently thought about it?",
+      "q5": "When an important task is difficult, boring, or requires a lot of mental effort, how often do you delay starting it?",
+      "q6": "How often do you start something with motivation but switch to another task before finishing the first one?",
+      "q7": "When you need to sit still or stay calm for a relatively long time, how often do you feel restless or a strong need to move?",
+      "q8": "How often do you act or make a decision before fully thinking about the possible consequences?",
+      "q9": "How often do you interrupt people, finish their sentences, or find it difficult to wait for your turn in conversations?",
+      "q10": "When something doesn't go as expected, how often do your emotions become intense quickly and take time to settle?"
+    },
+    "answers": {
+      "never": "Never",
+      "rarely": "Rarely",
+      "sometimes": "Sometimes",
+      "often": "Often",
+      "almostAlways": "Almost always"
+    },
+    "dimensions": {
+      "attention": "Attention",
+      "executiveFunction": "Executive Function",
+      "taskManagement": "Task Initiation & Completion",
+      "hyperactivity": "Hyperactivity & Restlessness",
+      "impulsivity": "Impulsivity",
+      "emotionalRegulation": "Emotional Regulation"
+    },
+    "challengeLevel": {
+      "less": "Less challenging",
+      "moderate": "Moderate challenge",
+      "more": "More challenging"
+    },
+    "result": {
+      "title": "Here's how your brain tends to work",
+      "subtitle": "This isn't a diagnosis. It's a snapshot that helps Onward adapt to you.",
+      "ready": "Your Onward Profile is ready.",
+      "topAreas": "Your strongest challenge areas",
+      "howCanHelp": "How Onward can help",
+      "cta": "Let's get started",
+      "disclaimer": "This profile is designed to personalize your Onward experience. It is not a medical diagnosis or a substitute for professional assessment."
+    },
+    "insights": {
+      "attention": "Focus Room and shorter focus sessions may be especially useful for you.",
+      "executive_function": "Task Shredder and simple prioritization may help reduce mental load.",
+      "task_management": "You may benefit from breaking tasks into very small steps.",
+      "hyperactivity": "Shorter focus sessions and movement breaks may fit your profile better.",
+      "impulsivity": "Decision Maker can help create a small pause before acting on difficult decisions.",
+      "emotional_regulation": "Brain Dump and Chat with Oly may help you slow down and externalize what you're feeling."
+    },
+    "featureCards": {
+      "shredder": {
+        "title": "Task Shredder",
+        "description": "Break overwhelming tasks into tiny next steps."
+      },
+      "focus": {
+        "title": "Focus Room",
+        "description": "Create a short, distraction-free focus session."
+      },
+      "dump": {
+        "title": "Brain Dump",
+        "description": "Empty your mind and slow down when things feel like a lot."
+      },
+      "decision": {
+        "title": "Decision Maker",
+        "description": "Make difficult choices with less mental friction."
+      },
+      "chat": {
+        "title": "Chat with Oly",
+        "description": "A space to reflect before jumping into action."
+      }
+    }
   }
 }

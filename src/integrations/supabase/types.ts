@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      user_adhd_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          completed_at: string
+          questionnaire_version: string
+          question_1: number
+          question_2: number
+          question_3: number
+          question_4: number
+          question_5: number
+          question_6: number
+          question_7: number
+          question_8: number
+          question_9: number
+          question_10: number
+          attention_score: number
+          executive_function_score: number
+          task_management_score: number
+          hyperactivity_score: number
+          impulsivity_score: number
+          emotional_regulation_score: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          completed_at?: string
+          questionnaire_version?: string
+          question_1: number
+          question_2: number
+          question_3: number
+          question_4: number
+          question_5: number
+          question_6: number
+          question_7: number
+          question_8: number
+          question_9: number
+          question_10: number
+          attention_score: number
+          executive_function_score: number
+          task_management_score: number
+          hyperactivity_score: number
+          impulsivity_score: number
+          emotional_regulation_score: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          completed_at?: string
+          questionnaire_version?: string
+          question_1?: number
+          question_2?: number
+          question_3?: number
+          question_4?: number
+          question_5?: number
+          question_6?: number
+          question_7?: number
+          question_8?: number
+          question_9?: number
+          question_10?: number
+          attention_score?: number
+          executive_function_score?: number
+          task_management_score?: number
+          hyperactivity_score?: number
+          impulsivity_score?: number
+          emotional_regulation_score?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           id: string
