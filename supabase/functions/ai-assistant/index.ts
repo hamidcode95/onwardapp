@@ -196,6 +196,93 @@ function validateDecide(parsed: unknown): { choice: string; reason: string } | n
   return { choice: p.choice, reason: p.reason };
 }
 
+// ---------------------------------------------------------------------------
+// ADHD Profile context — gives every AI operation awareness of the user's
+// self-reported challenge profile, sourced ONLY from the authenticated
+// caller's own row (RLS on user_adhd_profiles enforces this; the frontend
+// never gets to hand the backend a profile/scores directly).
+// ---------------------------------------------------------------------------
+
+interface ADHDProfileRow {
+  attention_score: number;
+  executive_function_score: number;
+  task_management_score: number;
+  hyperactivity_score: number;
+  impulsivity_score: number;
+  emotional_regulation_score: number;
+}
+
+const HIGH_CHALLENGE_THRESHOLD = 7;
+
+const DIMENSION_HINTS: Record<keyof ADHDProfileRow, string> = {
+  attention_score:
+    "Attention: favor Focus Room, shorter focus intervals, reducing distractions, one-task-at-a-time framing.",
+  executive_function_score:
+    "Executive Function: favor Task Shredder, simple prioritization, fewer simultaneous tasks.",
+  task_management_score:
+    "Task Initiation & Completion: favor breaking things into a tiny first action (\"just start for 2 minutes\"), Task Shredder, short Focus Room sessions.",
+  hyperactivity_score:
+    "Hyperactivity & Restlessness: favor shorter focus blocks, movement breaks, active transitions; avoid long static sessions.",
+  impulsivity_score:
+    "Impulsivity: favor Decision Maker, encouraging a short pause before acting on a decision.",
+  emotional_regulation_score:
+    "Emotional Regulation: favor supportive, non-judgmental language; suggest Brain Dump or just being a reflective space before jumping to productivity tactics.",
+};
+
+/**
+ * Fetches the authenticated user's profile using their own JWT-scoped
+ * client (never the frontend's payload), so RLS is what actually
+ * guarantees user A can never see user B's profile here. Returns null if
+ * the user hasn't completed the Journey yet — callers should degrade
+ * gracefully, not require it.
+ */
+async function fetchUserProfile(
+  supabaseClient: ReturnType<typeof createClient>,
+): Promise<ADHDProfileRow | null> {
+  const { data, error } = await supabaseClient
+    .from("user_adhd_profiles")
+    .select(
+      "attention_score, executive_function_score, task_management_score, hyperactivity_score, impulsivity_score, emotional_regulation_score",
+    )
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as ADHDProfileRow;
+}
+
+/**
+ * Renders the profile into a system-prompt block. Scores are given plainly
+ * (per-dimension "1-10, higher = more reported difficulty, self-reported,
+ * not a diagnosis") plus a couple of concrete hints for whichever
+ * dimensions are high — the model is instructed to let this shape its
+ * suggestions naturally rather than narrating the numbers back to the user.
+ */
+function buildProfileContext(profile: ADHDProfileRow | null): string {
+  if (!profile) return "";
+
+  const lines = [
+    `Attention: ${profile.attention_score}/10`,
+    `Executive Function: ${profile.executive_function_score}/10`,
+    `Task Initiation & Completion: ${profile.task_management_score}/10`,
+    `Hyperactivity & Restlessness: ${profile.hyperactivity_score}/10`,
+    `Impulsivity: ${profile.impulsivity_score}/10`,
+    `Emotional Regulation: ${profile.emotional_regulation_score}/10`,
+  ];
+
+  const hints = (Object.keys(DIMENSION_HINTS) as (keyof ADHDProfileRow)[])
+    .filter((key) => profile[key] >= HIGH_CHALLENGE_THRESHOLD)
+    .map((key) => `- ${DIMENSION_HINTS[key]}`);
+
+  return `
+
+USER ADHD PROFILE (self-reported personalization scores, NOT a diagnosis — higher means greater reported difficulty in that area):
+${lines.join("\n")}
+
+How to use this: let it shape your suggestions naturally and combine dimensions when relevant (e.g. high Attention + high Task Initiation might mean suggesting Task Shredder for the smallest next action, then a short Focus Room session). Do NOT mention the numbers, the word "score", or phrases like "because your profile shows..." to the user — just let the recommendations reflect it.${
+    hints.length > 0 ? `\n\nRelevant for this user:\n${hints.join("\n")}` : ""
+  }`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -228,6 +315,11 @@ serve(async (req) => {
     }
     const { type, payload } = body;
 
+    // Fetched once per request, from the authenticated caller's own row —
+    // reused for whichever operation type this request is.
+    const profile = await fetchUserProfile(supabaseClient);
+    const profileContext = buildProfileContext(profile);
+
     let systemPrompt = "";
     let userPrompt = "";
 
@@ -247,7 +339,7 @@ Rules:
 - Consider the ADHD brain - avoid overwhelming complexity
 
 Respond ONLY with a JSON array of sub-task strings. No explanations.
-Example: ["Research topic for 10 minutes", "Write first paragraph", "Take a 2-minute break"]`;
+Example: ["Research topic for 10 minutes", "Write first paragraph", "Take a 2-minute break"]` + profileContext;
         userPrompt = `Break down this task into small, manageable sub-tasks: "${payload.task}"`;
         break;
       }
@@ -270,7 +362,7 @@ Respond with a JSON object containing:
   "suggestion": "A specific activity recommendation",
   "reason": "Brief explanation why this matches their energy",
   "emoji": "A relevant emoji"
-}`;
+}` + profileContext;
         userPrompt = `My current energy level is ${payload.energyLevel}%. What activity should I do right now?`;
         break;
       }
@@ -289,7 +381,7 @@ Personality traits:
 - Celebrates small wins
 - Uses occasional emojis 🌟
 
-Keep responses short (2-3 sentences max) unless asked for more detail.`;
+Keep responses short (2-3 sentences max) unless asked for more detail.` + profileContext;
         userPrompt = payload.message;
         break;
       }
@@ -311,7 +403,7 @@ Respond with a JSON object:
   "reason": "A fun, encouraging 1-sentence reason"
 }
 
-Be playful and positive!`;
+Be playful and positive!` + profileContext;
         const optionsList = (options as { text: string; priority?: number }[])
           .map((o, i) => `${i + 1}. ${o.text} (priority: ${o.priority ?? "n/a"}/3)`)
           .join("\n");
